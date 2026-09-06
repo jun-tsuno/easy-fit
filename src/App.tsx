@@ -1,4 +1,4 @@
-import { Dumbbell, LogOut } from "lucide-react";
+import { Dumbbell, LogOut, NotebookPen } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
@@ -32,7 +32,12 @@ function App() {
         </div>
       </header>
       <main className="flex flex-1 flex-col items-center justify-center gap-4">
-        <Button>Get Started</Button>
+        <Button size="lg" asChild>
+          <Link to="/record">
+            <NotebookPen />
+            記録する
+          </Link>
+        </Button>
       </main>
     </PageContainer>
   );

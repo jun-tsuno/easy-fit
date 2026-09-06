@@ -3,6 +3,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import App from "./App";
 import { ExercisesPage } from "./pages/exercises";
 import { LoginPage } from "./pages/login";
+import { RecordPage } from "./pages/record";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
       {
         path: "/exercises",
         element: <ExercisesPage />,
+      },
+      {
+        path: "/record",
+        element: <RecordPage />,
       },
     ],
   },
