@@ -6,8 +6,9 @@ const schema = a.schema({
       name: a.string().required(),
       category: a.string(),
       workoutSets: a.hasMany('WorkoutSet', 'exerciseId'),
+      owner: a.string(),
     })
-    .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.owner().identityClaim('sub')]),
 
   WorkoutSet: a
     .model({
@@ -17,20 +18,23 @@ const schema = a.schema({
       weight: a.float().required(),
       reps: a.integer().required(),
       setNumber: a.integer().required(),
+      owner: a.string(),
     })
-    .authorization((allow) => [allow.owner()])
+    .authorization((allow) => [allow.owner().identityClaim('sub')])
     .secondaryIndexes((index) => [
-      index('owner').sortKeys(['date']),
-      index('exerciseId').sortKeys(['date']),
+      index('owner').sortKeys(['date']).queryField('listWorkoutSetsByDate'),
     ]),
 
   BodyWeight: a
     .model({
       date: a.date().required(),
       weight: a.float().required(),
+      owner: a.string(),
     })
-    .authorization((allow) => [allow.owner()])
-    .secondaryIndexes((index) => [index('owner').sortKeys(['date'])]),
+    .authorization((allow) => [allow.owner().identityClaim('sub')])
+    .secondaryIndexes((index) => [
+      index('owner').sortKeys(['date']).queryField('listBodyWeightsByDate'),
+    ]),
 })
 
 export type Schema = ClientSchema<typeof schema>
