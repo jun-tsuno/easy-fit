@@ -7,6 +7,8 @@
 
 :root {
   --radius: 0.625rem;
+  --accent-gradient-from: oklch(0.6 0.19 260);
+  --accent-gradient-to: oklch(0.75 0.15 230);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -41,6 +43,8 @@
 }
 
 .dark {
+  --accent-gradient-from: oklch(0.75 0.18 55);
+  --accent-gradient-to: oklch(0.65 0.2 35);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -112,6 +116,8 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-accent-gradient-from: var(--accent-gradient-from);
+  --color-accent-gradient-to: var(--accent-gradient-to);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
