@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router";
 import { useAuth } from "@/components/auth-provider";
+import { PageContainer } from "@/components/page-container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +32,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-svh w-full max-w-md flex-col items-center justify-center gap-6 p-4">
+    <PageContainer className="items-center justify-center gap-6">
       <h1 className="bg-gradient-to-r from-(--accent-gradient-from) to-(--accent-gradient-to) bg-clip-text text-2xl font-semibold text-transparent">
         easy-fit
       </h1>
@@ -66,6 +67,6 @@ export function LoginPage() {
           ログイン
         </Button>
       </form>
-    </div>
+    </PageContainer>
   );
 }

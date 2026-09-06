@@ -4,7 +4,7 @@ const schema = a.schema({
   Exercise: a
     .model({
       name: a.string().required(),
-      category: a.string(),
+      category: a.string().required(),
       workoutSets: a.hasMany("WorkoutSet", "exerciseId"),
       owner: a.string(),
     })
