@@ -1,4 +1,5 @@
-import { LogOut } from "lucide-react";
+import { Dumbbell, LogOut } from "lucide-react";
+import { Link } from "react-router";
 import { useAuth } from "@/components/auth-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,11 @@ function App() {
           easy-fit
         </h1>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" aria-label="種目管理" asChild>
+            <Link to="/exercises">
+              <Dumbbell />
+            </Link>
+          </Button>
           <ThemeToggle />
           <Button
             variant="outline"
