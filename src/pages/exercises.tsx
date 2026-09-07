@@ -1,7 +1,7 @@
-import { cn } from "cn";
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import { type FormEvent, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
+import { CategoryDot } from "@/components/category-dot";
 import { PageContainer } from "@/components/page-container";
 import {
   AlertDialog,
@@ -35,24 +35,6 @@ import {
   getExerciseCategory,
   isExerciseCategoryValue,
 } from "@/utils/exercise-categories";
-
-function CategoryDot({
-  color,
-  className,
-}: {
-  color: string;
-  className?: string;
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-block size-2.5 shrink-0 rounded-full align-middle",
-        className,
-      )}
-      style={{ backgroundColor: color }}
-    />
-  );
-}
 
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
@@ -112,10 +94,18 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
 }
 
 export function ExercisesPage() {
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get("category");
+  const backTo = searchParams.get("from") ?? "/";
+
   const { data: exercises, isPending, isError } = useExercises();
   const createExercise = useCreateExercise();
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<ExerciseCategoryValue | "">("");
+  const [category, setCategory] = useState<ExerciseCategoryValue | "">(
+    initialCategory && isExerciseCategoryValue(initialCategory)
+      ? initialCategory
+      : "",
+  );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -141,8 +131,8 @@ export function ExercisesPage() {
   return (
     <PageContainer>
       <header className="flex items-center gap-2 py-2">
-        <Button variant="outline" size="icon" aria-label="ホームに戻る" asChild>
-          <Link to="/">
+        <Button variant="outline" size="icon" aria-label="戻る" asChild>
+          <Link to={backTo}>
             <ArrowLeft />
           </Link>
         </Button>

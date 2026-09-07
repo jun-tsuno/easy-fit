@@ -1,4 +1,4 @@
-import { Dumbbell, LogOut, NotebookPen } from "lucide-react";
+import { Dumbbell, LogOut, NotebookPen, Weight } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
@@ -31,11 +31,17 @@ function App() {
           </Button>
         </div>
       </header>
-      <main className="flex flex-1 flex-col items-center justify-center gap-4">
-        <Button size="lg" asChild>
+      <main className="flex flex-1 flex-col items-center justify-center gap-3">
+        <Button size="lg" className="w-full" asChild>
           <Link to="/record">
             <NotebookPen />
-            記録する
+            トレーニングを記録
+          </Link>
+        </Button>
+        <Button size="lg" variant="outline" className="w-full" asChild>
+          <Link to="/body-weight">
+            <Weight />
+            体重を記録
           </Link>
         </Button>
       </main>
