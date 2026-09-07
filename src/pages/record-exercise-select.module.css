@@ -1,0 +1,79 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.loadingRow {
+  display: flex;
+  justify-content: center;
+  padding-block: 2.5rem;
+}
+
+.error {
+  padding-block: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-destructive);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-block: 1rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-fg-muted);
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.itemLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.itemLink:hover {
+  background-color: var(--color-bg-muted);
+}
+
+.itemName {
+  font-weight: 500;
+}
+
+.itemChevron {
+  flex-shrink: 0;
+  color: var(--color-fg-muted);
+}

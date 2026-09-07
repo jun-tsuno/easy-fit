@@ -1,0 +1,103 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-block: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-destructive);
+}
+
+.list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 2rem;
+}
+
+.loadingRow {
+  display: flex;
+  justify-content: center;
+  padding-block: 1.5rem;
+}
+
+.emptyText {
+  padding-block: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-fg-muted);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-fg-muted);
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  padding: 0.75rem;
+}
+
+.rowName {
+  flex: 1;
+  margin: 0;
+  font-weight: 500;
+}
+
+.dotSpacing {
+  margin-right: 0.75rem;
+}

@@ -1,29 +1,18 @@
-import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+import {
+  Button,
+  createListCollection,
+  Dialog,
+  IconButton,
+  Input,
+  Portal,
+  Select,
+  Spinner,
+} from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
+import { LuArrowLeft, LuTrash2 } from "react-icons/lu";
 import { Link, useSearchParams } from "react-router";
 import { CategoryDot } from "@/components/category-dot";
 import { PageContainer } from "@/components/page-container";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   useCreateExercise,
   useDeleteExercise,
@@ -35,6 +24,13 @@ import {
   getExerciseCategory,
   isExerciseCategoryValue,
 } from "@/utils/exercise-categories";
+import styles from "./exercises.module.css";
+
+const categoryCollection = createListCollection({
+  items: EXERCISE_CATEGORIES,
+  itemToString: (item) => item.label,
+  itemToValue: (item) => item.value,
+});
 
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
@@ -47,48 +43,55 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
   };
 
   return (
-    <li
-      className="flex items-center gap-3 rounded-md border border-border border-l-4 p-3"
-      style={{ borderLeftColor: category.color }}
-    >
-      <p className="flex-1 font-medium">{exercise.name}</p>
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger asChild>
-          <Button
+    <li className={styles.row} style={{ borderLeftColor: category.color }}>
+      <p className={styles.rowName}>{exercise.name}</p>
+      <Dialog.Root
+        role="alertdialog"
+        open={open}
+        onOpenChange={(details) => setOpen(details.open)}
+      >
+        <Dialog.Trigger asChild>
+          <IconButton
             variant="ghost"
-            size="icon-sm"
+            size="sm"
             aria-label={`${exercise.name}を削除`}
           >
-            <Trash2 className="text-muted-foreground" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>種目を削除しますか?</AlertDialogTitle>
-            <AlertDialogDescription>
-              「{exercise.name}」を削除します。この操作は取り消せません。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {deleteExercise.isError && (
-            <p className="text-sm text-destructive">削除に失敗しました。</p>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteExercise.isPending}>
-              キャンセル
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.preventDefault();
-                handleDelete();
-              }}
-              disabled={deleteExercise.isPending}
-            >
-              {deleteExercise.isPending && <Loader2 className="animate-spin" />}
-              削除する
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <LuTrash2 />
+          </IconButton>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>種目を削除しますか?</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Dialog.Description>
+                  「{exercise.name}」を削除します。この操作は取り消せません。
+                </Dialog.Description>
+                {deleteExercise.isError && (
+                  <p className={styles.error}>削除に失敗しました。</p>
+                )}
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline" disabled={deleteExercise.isPending}>
+                    キャンセル
+                  </Button>
+                </Dialog.ActionTrigger>
+                <Button
+                  colorPalette="red"
+                  loading={deleteExercise.isPending}
+                  onClick={handleDelete}
+                >
+                  削除する
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
     </li>
   );
 }
@@ -130,18 +133,20 @@ export function ExercisesPage() {
 
   return (
     <PageContainer>
-      <header className="flex items-center gap-2 py-2">
-        <Button variant="outline" size="icon" aria-label="戻る" asChild>
+      <header className={styles.header}>
+        <IconButton variant="outline" aria-label="戻る" asChild>
           <Link to={backTo}>
-            <ArrowLeft />
+            <LuArrowLeft />
           </Link>
-        </Button>
-        <h1 className="text-lg font-semibold">種目管理</h1>
+        </IconButton>
+        <h1 className={styles.title}>種目管理</h1>
       </header>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 py-6">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="exercise-name">種目名</Label>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.field}>
+          <label htmlFor="exercise-name" className={styles.label}>
+            種目名
+          </label>
           <Input
             id="exercise-name"
             value={name}
@@ -149,61 +154,73 @@ export function ExercisesPage() {
             required
           />
         </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="exercise-category">カテゴリ</Label>
-          <Select
-            value={category}
-            onValueChange={(value) =>
-              setCategory(value as ExerciseCategoryValue)
+        <div className={styles.field}>
+          <label htmlFor="exercise-category" className={styles.label}>
+            カテゴリ
+          </label>
+          <Select.Root
+            collection={categoryCollection}
+            value={category ? [category] : []}
+            onValueChange={(details) =>
+              setCategory((details.value[0] as ExerciseCategoryValue) ?? "")
             }
           >
-            <SelectTrigger id="exercise-category">
-              <SelectValue placeholder="カテゴリを選択" />
-            </SelectTrigger>
-            <SelectContent>
-              {EXERCISE_CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  <CategoryDot color={cat.color} className="mr-3" />
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select.Control>
+              <Select.Trigger id="exercise-category">
+                <Select.ValueText placeholder="カテゴリを選択" />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+            <Portal>
+              <Select.Positioner>
+                <Select.Content>
+                  {EXERCISE_CATEGORIES.map((cat) => (
+                    <Select.Item item={cat} key={cat.value}>
+                      <CategoryDot
+                        color={cat.color}
+                        className={styles.dotSpacing}
+                      />
+                      <Select.ItemText>{cat.label}</Select.ItemText>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Portal>
+          </Select.Root>
         </div>
         {createExercise.isError && (
-          <p className="text-sm text-destructive">種目の登録に失敗しました。</p>
+          <p className={styles.error}>種目の登録に失敗しました。</p>
         )}
         <Button
           type="submit"
-          className="mt-2"
-          disabled={createExercise.isPending || !name.trim() || !category}
+          mt="2"
+          loading={createExercise.isPending}
+          disabled={!name.trim() || !category}
         >
-          {createExercise.isPending && <Loader2 className="animate-spin" />}
           追加する
         </Button>
       </form>
 
-      <div className="mt-4 flex flex-col gap-8 border-t border-border pt-8">
+      <div className={styles.list}>
         {isPending && (
-          <div className="flex justify-center py-6">
-            <Loader2 className="animate-spin text-muted-foreground" />
+          <div className={styles.loadingRow}>
+            <Spinner color="fg.muted" />
           </div>
         )}
-        {isError && (
-          <p className="text-sm text-destructive">種目の取得に失敗しました。</p>
-        )}
+        {isError && <p className={styles.error}>種目の取得に失敗しました。</p>}
         {!isPending && !isError && (exercises?.length ?? 0) === 0 && (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            登録された種目はありません。
-          </p>
+          <p className={styles.emptyText}>登録された種目はありません。</p>
         )}
         {grouped.map((group) => (
-          <section key={group.category.value} className="flex flex-col gap-3">
-            <h2 className="flex items-center gap-2.5 text-sm font-semibold text-muted-foreground">
+          <section key={group.category.value} className={styles.section}>
+            <h2 className={styles.sectionTitle}>
               <CategoryDot color={group.category.color} />
               {group.category.label}
             </h2>
-            <ul className="flex flex-col gap-2">
+            <ul className={styles.items}>
               {group.items.map((exercise) => (
                 <ExerciseRow key={exercise.id} exercise={exercise} />
               ))}
@@ -211,11 +228,9 @@ export function ExercisesPage() {
           </section>
         ))}
         {uncategorized.length > 0 && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-muted-foreground">
-              未分類
-            </h2>
-            <ul className="flex flex-col gap-2">
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>未分類</h2>
+            <ul className={styles.items}>
               {uncategorized.map((exercise) => (
                 <ExerciseRow key={exercise.id} exercise={exercise} />
               ))}

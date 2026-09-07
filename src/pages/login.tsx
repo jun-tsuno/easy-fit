@@ -1,11 +1,10 @@
-import { Loader2 } from "lucide-react";
+import { Button, Input } from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import titleStyles from "@/styles/brand-title.module.css";
+import styles from "./login.module.css";
 
 export function LoginPage() {
   const { status, signIn } = useAuth();
@@ -32,13 +31,13 @@ export function LoginPage() {
   };
 
   return (
-    <PageContainer className="items-center justify-center gap-6">
-      <h1 className="bg-gradient-to-r from-(--accent-gradient-from) to-(--accent-gradient-to) bg-clip-text text-2xl font-semibold text-transparent">
-        easy-fit
-      </h1>
-      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="email">メールアドレス</Label>
+    <PageContainer className={styles.container}>
+      <h1 className={titleStyles.title}>easy-fit</h1>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.field}>
+          <label htmlFor="email" className={styles.label}>
+            メールアドレス
+          </label>
           <Input
             id="email"
             name="email"
@@ -49,8 +48,10 @@ export function LoginPage() {
             onChange={(event) => setEmail(event.target.value)}
           />
         </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">パスワード</Label>
+        <div className={styles.field}>
+          <label htmlFor="password" className={styles.label}>
+            パスワード
+          </label>
           <Input
             id="password"
             name="password"
@@ -61,9 +62,8 @@ export function LoginPage() {
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" disabled={isSubmitting} className="mt-2">
-          {isSubmitting && <Loader2 className="animate-spin" />}
+        {error && <p className={styles.error}>{error}</p>}
+        <Button type="submit" loading={isSubmitting} mt="2">
           ログイン
         </Button>
       </form>
