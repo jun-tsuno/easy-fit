@@ -1,14 +1,15 @@
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@chakra-ui/react";
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "@/components/auth-provider";
+import styles from "./protected-route.module.css";
 
 export function ProtectedRoute() {
   const { status } = useAuth();
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-svh items-center justify-center">
-        <Loader2 className="animate-spin text-muted-foreground" />
+      <div className={styles.loading}>
+        <Spinner color="fg.muted" />
       </div>
     );
   }

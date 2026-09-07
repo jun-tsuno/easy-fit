@@ -1,18 +1,17 @@
-import { Moon, Sun } from "lucide-react";
+import { IconButton } from "@chakra-ui/react";
+import { LuMoon, LuSun } from "react-icons/lu";
 import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <Button
+    <IconButton
       variant="outline"
-      size="icon"
       aria-label="テーマを切り替える"
       onClick={toggleTheme}
     >
-      {theme === "dark" ? <Sun /> : <Moon />}
-    </Button>
+      {theme === "dark" ? <LuSun /> : <LuMoon />}
+    </IconButton>
   );
 }

@@ -1,4 +1,4 @@
-import { cn } from "cn";
+import styles from "./category-dot.module.css";
 
 function CategoryDot({
   color,
@@ -9,10 +9,7 @@ function CategoryDot({
 }) {
   return (
     <span
-      className={cn(
-        "inline-block size-2.5 shrink-0 rounded-full align-middle",
-        className,
-      )}
+      className={className ? `${styles.dot} ${className}` : styles.dot}
       style={{ backgroundColor: color }}
     />
   );

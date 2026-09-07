@@ -1,14 +1,13 @@
-import { ArrowLeft, Loader2, Plus } from "lucide-react";
+import { IconButton, Input, Spinner } from "@chakra-ui/react";
+import { LuArrowLeft, LuPlus } from "react-icons/lu";
 import { Link } from "react-router";
 import { CategoryDot } from "@/components/category-dot";
 import { PageContainer } from "@/components/page-container";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useDateParam } from "@/hooks/use-date-param";
 import { useExercises } from "@/hooks/use-exercises";
 import { useWorkoutSetsByDate } from "@/hooks/use-workout-sets";
 import { EXERCISE_CATEGORIES } from "@/utils/exercise-categories";
+import styles from "./record.module.css";
 
 export function RecordListPage() {
   const [date, setDate] = useDateParam();
@@ -30,29 +29,26 @@ export function RecordListPage() {
 
   return (
     <PageContainer>
-      <header className="flex items-center justify-between gap-2 py-2">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="ホームに戻る"
-            asChild
-          >
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <IconButton variant="outline" aria-label="ホームに戻る" asChild>
             <Link to="/">
-              <ArrowLeft />
+              <LuArrowLeft />
             </Link>
-          </Button>
-          <h1 className="text-lg font-semibold">トレーニング記録</h1>
+          </IconButton>
+          <h1 className={styles.title}>トレーニング記録</h1>
         </div>
-        <Button size="icon" aria-label="記録を追加" asChild>
+        <IconButton aria-label="記録を追加" asChild>
           <Link to={`/record/new?date=${date}`}>
-            <Plus />
+            <LuPlus />
           </Link>
-        </Button>
+        </IconButton>
       </header>
 
-      <div className="flex flex-col gap-2 py-4">
-        <Label htmlFor="record-date">日付</Label>
+      <div className={styles.dateField}>
+        <label htmlFor="record-date" className={styles.label}>
+          日付
+        </label>
         <Input
           id="record-date"
           type="date"
@@ -61,35 +57,33 @@ export function RecordListPage() {
         />
       </div>
 
-      <div className="flex flex-col gap-8 border-t border-border pt-6">
+      <div className={styles.list}>
         {isPending && (
-          <div className="flex justify-center py-6">
-            <Loader2 className="animate-spin text-muted-foreground" />
+          <div className={styles.loadingRow}>
+            <Spinner color="fg.muted" />
           </div>
         )}
-        {isError && (
-          <p className="text-sm text-destructive">記録の取得に失敗しました。</p>
-        )}
+        {isError && <p className={styles.error}>記録の取得に失敗しました。</p>}
         {!isPending && !isError && grouped.length === 0 && (
-          <p className="py-6 text-center text-sm text-muted-foreground">
+          <p className={styles.emptyText}>
             この日のトレーニング記録はまだありません。
           </p>
         )}
         {grouped.map((group) => (
-          <section key={group.category.value} className="flex flex-col gap-4">
-            <h2 className="flex items-center gap-2.5 text-sm font-semibold text-muted-foreground">
+          <section key={group.category.value} className={styles.section}>
+            <h2 className={styles.sectionTitle}>
               <CategoryDot color={group.category.color} />
               {group.category.label}
             </h2>
-            <ul className="flex flex-col gap-3">
+            <ul className={styles.items}>
               {group.items.map(({ exercise, sets }) => (
                 <li key={exercise.id}>
                   <Link
                     to={`/record/new/${exercise.id}?date=${date}`}
-                    className="block rounded-md border border-border p-3 transition-colors hover:bg-muted"
+                    className={styles.itemLink}
                   >
-                    <p className="font-medium">{exercise.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className={styles.itemName}>{exercise.name}</p>
+                    <p className={styles.itemSets}>
                       {sets
                         .map((set) => `${set.weight}kg×${set.reps}回`)
                         .join(" / ")}
