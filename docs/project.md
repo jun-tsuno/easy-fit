@@ -13,9 +13,9 @@
 | サーバー状態管理 | TanStack React Query v5 |
 | バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
-| UI | shadcn/ui（Radix UI + Tailwind CSS v4 + class-variance-authority）※Issue #12 で Chakra UI + CSS Modules へ移行予定 |
-| アイコン | lucide-react ※Issue #12 で react-icons へ移行予定 |
-| トースト通知 | sonner |
+| UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
+| アイコン | react-icons |
+| トースト通知 | Chakra UI の `Toaster`（`src/components/ui/toaster.tsx`） |
 | Lint/Format | Biome |
 
 ## データモデル（`amplify/data/resource.ts`）
@@ -48,7 +48,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ### 種目管理画面 `/exercises`
 - 種目名・カテゴリ（胸/背中/肩/腕/脚/有酸素/その他）を指定して種目を追加
 - 登録済み種目をカテゴリごとにセクション分けして一覧表示（カテゴリカラーのドットで区別）
-- 種目ごとに削除可能（`AlertDialog` で確認）
+- 種目ごとに削除可能（確認ダイアログ表示）
 - クエリパラメータ `?category=` で追加フォームのカテゴリを事前選択、`?from=` で戻り先を指定可能（記録画面からの「種目を追加」導線で使用）
 
 ### トレーニング記録一覧画面 `/record?date=YYYY-MM-DD`
