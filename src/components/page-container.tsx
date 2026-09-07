@@ -1,5 +1,5 @@
-import { cn } from "cn";
 import type * as React from "react";
+import styles from "./page-container.module.css";
 
 /**
  * 全ページ共通のレイアウトコンテナ。
@@ -8,11 +8,9 @@ import type * as React from "react";
 function PageContainer({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="page-container"
-      className={cn(
-        "mx-auto flex min-h-svh w-full max-w-md flex-col px-6 pt-8 pb-30",
-        className,
-      )}
+      className={
+        className ? `${styles.container} ${className}` : styles.container
+      }
       {...props}
     />
   );

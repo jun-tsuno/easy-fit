@@ -1,46 +1,45 @@
-import { Dumbbell, LogOut, NotebookPen, Weight } from "lucide-react";
+import { Button, IconButton } from "@chakra-ui/react";
+import { LuDumbbell, LuLogOut, LuNotebookPen, LuWeight } from "react-icons/lu";
 import { Link } from "react-router";
+import styles from "@/App.module.css";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
+import gradientStyles from "@/styles/gradient-title.module.css";
 
 function App() {
   const { signOut } = useAuth();
 
   return (
     <PageContainer>
-      <header className="flex items-center justify-between pb-4">
-        <h1 className="bg-gradient-to-r from-(--accent-gradient-from) to-(--accent-gradient-to) bg-clip-text text-2xl font-semibold text-transparent">
-          easy-fit
-        </h1>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" aria-label="種目管理" asChild>
+      <header className={styles.header}>
+        <h1 className={gradientStyles.title}>easy-fit</h1>
+        <div className={styles.headerActions}>
+          <IconButton variant="outline" aria-label="種目管理" asChild>
             <Link to="/exercises">
-              <Dumbbell />
+              <LuDumbbell />
             </Link>
-          </Button>
+          </IconButton>
           <ThemeToggle />
-          <Button
+          <IconButton
             variant="outline"
-            size="icon"
             aria-label="ログアウト"
             onClick={() => signOut()}
           >
-            <LogOut />
-          </Button>
+            <LuLogOut />
+          </IconButton>
         </div>
       </header>
-      <main className="flex flex-1 flex-col items-center justify-center gap-3">
-        <Button size="lg" className="w-full" asChild>
+      <main className={styles.main}>
+        <Button size="lg" w="full" asChild>
           <Link to="/record">
-            <NotebookPen />
+            <LuNotebookPen />
             トレーニングを記録
           </Link>
         </Button>
-        <Button size="lg" variant="outline" className="w-full" asChild>
+        <Button size="lg" variant="outline" w="full" asChild>
           <Link to="/body-weight">
-            <Weight />
+            <LuWeight />
             体重を記録
           </Link>
         </Button>

@@ -1,16 +1,15 @@
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Button, IconButton, Input } from "@chakra-ui/react";
 import { type FormEvent, useEffect, useState } from "react";
+import { LuArrowLeft } from "react-icons/lu";
 import { Link } from "react-router";
-import { toast } from "sonner";
 import { PageContainer } from "@/components/page-container";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { toaster } from "@/components/ui/toaster";
 import {
   useBodyWeightByDate,
   useSaveBodyWeight,
 } from "@/hooks/use-body-weight";
 import { useDateParam } from "@/hooks/use-date-param";
+import styles from "./body-weight.module.css";
 
 export function BodyWeightPage() {
   const [date, setDate] = useDateParam();
@@ -30,25 +29,27 @@ export function BodyWeightPage() {
         id: bodyWeight?.id ?? null,
         weight: Number(weightInput),
       });
-      toast.success("体重を記録しました");
+      toaster.create({ title: "体重を記録しました", type: "success" });
     } catch {
-      toast.error("体重の保存に失敗しました。");
+      toaster.create({ title: "体重の保存に失敗しました。", type: "error" });
     }
   };
 
   return (
     <PageContainer>
-      <header className="flex items-center gap-2 py-2">
-        <Button variant="outline" size="icon" aria-label="ホームに戻る" asChild>
+      <header className={styles.header}>
+        <IconButton variant="outline" aria-label="ホームに戻る" asChild>
           <Link to="/">
-            <ArrowLeft />
+            <LuArrowLeft />
           </Link>
-        </Button>
-        <h1 className="text-lg font-semibold">体重記録</h1>
+        </IconButton>
+        <h1 className={styles.title}>体重記録</h1>
       </header>
 
-      <div className="flex flex-col gap-2 py-4">
-        <Label htmlFor="body-weight-date">日付</Label>
+      <div className={styles.dateField}>
+        <label htmlFor="body-weight-date" className={styles.label}>
+          日付
+        </label>
         <Input
           id="body-weight-date"
           type="date"
@@ -57,9 +58,11 @@ export function BodyWeightPage() {
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 py-4">
-        <Label htmlFor="body-weight">体重 (kg)</Label>
-        <div className="flex gap-2">
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <label htmlFor="body-weight" className={styles.label}>
+          体重 (kg)
+        </label>
+        <div className={styles.inputRow}>
           <Input
             id="body-weight"
             type="number"
@@ -71,9 +74,9 @@ export function BodyWeightPage() {
           />
           <Button
             type="submit"
-            disabled={saveBodyWeight.isPending || !weightInput}
+            loading={saveBodyWeight.isPending}
+            disabled={!weightInput}
           >
-            {saveBodyWeight.isPending && <Loader2 className="animate-spin" />}
             保存
           </Button>
         </div>

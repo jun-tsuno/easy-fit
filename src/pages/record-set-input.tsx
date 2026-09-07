@@ -1,10 +1,9 @@
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { Button, IconButton, Input, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { LuArrowLeft, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Link, useParams } from "react-router";
-import { toast } from "sonner";
 import { PageContainer } from "@/components/page-container";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { toaster } from "@/components/ui/toaster";
 import { useDateParam } from "@/hooks/use-date-param";
 import { useExercises } from "@/hooks/use-exercises";
 import {
@@ -13,6 +12,7 @@ import {
   useUpdateWorkoutSet,
   useWorkoutSetsByExercise,
 } from "@/hooks/use-workout-sets";
+import styles from "./record-set-input.module.css";
 
 type SetRow = {
   key: string;
@@ -21,9 +21,6 @@ type SetRow = {
   reps: string;
   setNumber: number;
 };
-
-const underlineInputClassName =
-  "rounded-none border-0 border-b border-input bg-transparent px-0 text-center shadow-none focus-visible:ring-0";
 
 export function RecordSetInputPage() {
   const { exerciseId } = useParams<{ exerciseId: string }>();
@@ -93,7 +90,7 @@ export function RecordSetInputPage() {
       }
       setRows((prev) => (prev ?? []).filter((item) => item.key !== row.key));
     } catch {
-      toast.error("削除に失敗しました。");
+      toaster.create({ title: "削除に失敗しました。", type: "error" });
     }
   };
 
@@ -122,49 +119,43 @@ export function RecordSetInputPage() {
             item.key === row.key ? { ...item, id: created.id } : item,
           ),
         );
-        toast.success(`${row.setNumber}セット目を記録しました`);
+        toaster.create({
+          title: `${row.setNumber}セット目を記録しました`,
+          type: "success",
+        });
       }
     } catch {
-      toast.error("記録の保存に失敗しました。");
+      toaster.create({ title: "記録の保存に失敗しました。", type: "error" });
     }
   };
 
   return (
     <PageContainer>
-      <header className="flex items-center gap-2 py-2">
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="種目選択に戻る"
-          asChild
-        >
+      <header className={styles.header}>
+        <IconButton variant="outline" aria-label="種目選択に戻る" asChild>
           <Link to={`/record/new?date=${date}`}>
-            <ArrowLeft />
+            <LuArrowLeft />
           </Link>
-        </Button>
-        <h1 className="text-lg font-semibold">{exercise?.name ?? "記録"}</h1>
+        </IconButton>
+        <h1 className={styles.title}>{exercise?.name ?? "記録"}</h1>
       </header>
 
-      <div className="flex flex-col gap-4 py-6">
-        {isError && (
-          <p className="py-6 text-center text-sm text-destructive">
-            記録の取得に失敗しました。
-          </p>
-        )}
+      <div className={styles.body}>
+        {isError && <p className={styles.error}>記録の取得に失敗しました。</p>}
         {!isError && rows === null && (
-          <div className="flex justify-center py-6">
-            <Loader2 className="animate-spin text-muted-foreground" />
+          <div className={styles.loadingRow}>
+            <Spinner color="fg.muted" />
           </div>
         )}
         {!isError &&
           rows !== null &&
           rows.map((row) => (
-            <div key={row.key} className="flex items-center gap-3">
-              <span className="w-5 shrink-0 text-sm text-muted-foreground">
-                {row.setNumber}
-              </span>
-              <div className="flex flex-1 items-center gap-2">
+            <div key={row.key} className={styles.row}>
+              <span className={styles.setNumber}>{row.setNumber}</span>
+              <div className={styles.inputGroup}>
                 <Input
+                  variant="flushed"
+                  textAlign="center"
                   type="number"
                   inputMode="decimal"
                   step="0.5"
@@ -174,15 +165,14 @@ export function RecordSetInputPage() {
                     updateRowField(row.key, "weight", event.target.value)
                   }
                   onBlur={() => handleRowBlur(row)}
-                  className={underlineInputClassName}
                 />
-                <span className="shrink-0 text-sm text-muted-foreground">
-                  kg
-                </span>
+                <span className={styles.unit}>kg</span>
               </div>
-              <span className="shrink-0 text-muted-foreground">×</span>
-              <div className="flex flex-1 items-center gap-2">
+              <span className={styles.times}>×</span>
+              <div className={styles.inputGroup}>
                 <Input
+                  variant="flushed"
+                  textAlign="center"
                   type="number"
                   inputMode="numeric"
                   placeholder="回数"
@@ -191,26 +181,27 @@ export function RecordSetInputPage() {
                     updateRowField(row.key, "reps", event.target.value)
                   }
                   onBlur={() => handleRowBlur(row)}
-                  className={underlineInputClassName}
                 />
-                <span className="shrink-0 text-sm text-muted-foreground">
-                  回
-                </span>
+                <span className={styles.unit}>回</span>
               </div>
-              <Button
+              <IconButton
                 variant="ghost"
-                size="icon-sm"
+                size="sm"
                 aria-label="セットを削除"
                 onClick={() => handleDeleteRow(row)}
               >
-                <Trash2 className="text-muted-foreground" />
-              </Button>
+                <LuTrash2 />
+              </IconButton>
             </div>
           ))}
 
         {!isError && rows !== null && (
-          <Button variant="outline" onClick={handleAddRow} className="mt-2">
-            <Plus />
+          <Button
+            variant="outline"
+            onClick={handleAddRow}
+            className={styles.addButton}
+          >
+            <LuPlus />
             セットを追加
           </Button>
         )}
