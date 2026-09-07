@@ -3,7 +3,7 @@ import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
-import gradientStyles from "@/styles/gradient-title.module.css";
+import titleStyles from "@/styles/brand-title.module.css";
 import styles from "./login.module.css";
 
 export function LoginPage() {
@@ -32,7 +32,7 @@ export function LoginPage() {
 
   return (
     <PageContainer className={styles.container}>
-      <h1 className={gradientStyles.title}>easy-fit</h1>
+      <h1 className={titleStyles.title}>easy-fit</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="email" className={styles.label}>

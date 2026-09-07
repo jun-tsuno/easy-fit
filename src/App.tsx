@@ -5,7 +5,7 @@ import styles from "@/App.module.css";
 import { useAuth } from "@/components/auth-provider";
 import { PageContainer } from "@/components/page-container";
 import { ThemeToggle } from "@/components/theme-toggle";
-import gradientStyles from "@/styles/gradient-title.module.css";
+import titleStyles from "@/styles/brand-title.module.css";
 
 function App() {
   const { signOut } = useAuth();
@@ -13,7 +13,7 @@ function App() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <h1 className={gradientStyles.title}>easy-fit</h1>
+        <h1 className={titleStyles.title}>easy-fit</h1>
         <div className={styles.headerActions}>
           <IconButton variant="outline" aria-label="種目管理" asChild>
             <Link to="/exercises">

@@ -6,8 +6,7 @@
   --color-border: oklch(0.922 0 0);
   --color-bg-muted: oklch(0.97 0 0);
   --color-destructive: oklch(0.577 0.245 27.325);
-  --accent-gradient-from: oklch(0.6 0.19 260);
-  --accent-gradient-to: oklch(0.75 0.15 230);
+  --color-accent: #10a894;
 }
 
 .dark {
@@ -16,8 +15,7 @@
   --color-border: oklch(1 0 0 / 10%);
   --color-bg-muted: oklch(0.269 0 0);
   --color-destructive: oklch(0.704 0.191 22.216);
-  --accent-gradient-from: oklch(0.75 0.18 55);
-  --accent-gradient-to: oklch(0.65 0.2 35);
+  --color-accent: #22c3aa;
 }
 
 *,
