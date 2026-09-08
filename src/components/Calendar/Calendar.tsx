@@ -47,7 +47,6 @@ function Calendar({
 
   const goToToday = () => {
     onMonthChange(now.getFullYear(), now.getMonth() + 1);
-    onSelectDate(today);
   };
 
   return (
@@ -71,7 +70,7 @@ function Calendar({
               className={styles.todayButton}
               onClick={goToToday}
             >
-              今日
+              今月
             </button>
           )}
           <IconButton
@@ -109,7 +108,7 @@ function Calendar({
               data-outside={!isCurrentMonth || undefined}
               data-today={isToday || undefined}
               data-selected={isSelected || undefined}
-              aria-pressed={isSelected}
+              aria-current={isToday ? "date" : undefined}
               aria-label={dateString}
               onClick={() => onSelectDate(dateString)}
             >

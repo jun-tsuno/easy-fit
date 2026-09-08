@@ -1,4 +1,4 @@
-import { IconButton, Input, Spinner } from "@chakra-ui/react";
+import { IconButton, Spinner } from "@chakra-ui/react";
 import { LuArrowLeft, LuPlus } from "react-icons/lu";
 import { Link } from "react-router";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
@@ -6,11 +6,12 @@ import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useDateParam } from "@/hooks/useDateParam";
 import { useExercises } from "@/hooks/useExercises";
 import { useWorkoutSetsByDate } from "@/hooks/useWorkoutSets";
+import { formatDateLabel } from "@/utils/date";
 import { EXERCISE_CATEGORIES } from "@/utils/exerciseCategories";
 import styles from "./Record.module.css";
 
 export function RecordListPage() {
-  const [date, setDate] = useDateParam();
+  const [date] = useDateParam();
   const { data: exercises } = useExercises();
   const { data: workoutSets, isPending, isError } = useWorkoutSetsByDate(date);
 
@@ -36,7 +37,9 @@ export function RecordListPage() {
               <LuArrowLeft />
             </Link>
           </IconButton>
-          <h1 className={styles.title}>トレーニング記録</h1>
+          <h1 className={styles.title}>
+            {formatDateLabel(date)}のトレーニング
+          </h1>
         </div>
         <IconButton aria-label="記録を追加" asChild>
           <Link to={`/record/new?date=${date}`}>
@@ -44,18 +47,6 @@ export function RecordListPage() {
           </Link>
         </IconButton>
       </header>
-
-      <div className={styles.dateField}>
-        <label htmlFor="record-date" className={styles.label}>
-          日付
-        </label>
-        <Input
-          id="record-date"
-          type="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-        />
-      </div>
 
       <div className={styles.list}>
         {isPending && (

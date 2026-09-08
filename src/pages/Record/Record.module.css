@@ -18,25 +18,11 @@
   font-weight: 600;
 }
 
-.dateField {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-block: 1rem;
-}
-
-.label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
 .list {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  margin-top: 1.5rem;
   border-top: 1px solid var(--color-border);
   padding-top: 1.5rem;
 }

@@ -66,3 +66,12 @@ export function formatShortDate(dateString: string): string {
   const date = parseDateString(dateString);
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
+
+const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"] as const;
+
+/** "9月8日(月)" 形式の日付ラベル */
+export function formatDateLabel(dateString: string): string {
+  const date = parseDateString(dateString);
+  const weekday = WEEKDAY_LABELS[date.getDay()];
+  return `${date.getMonth() + 1}月${date.getDate()}日(${weekday})`;
+}
