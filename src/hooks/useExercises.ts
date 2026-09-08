@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { client } from "@/lib/amplify-client";
+import { client } from "@/lib/amplifyClient";
 import type { ExerciseCategoryValue } from "@/types/exercise";
 
 const exercisesQueryKey = ["exercises"];

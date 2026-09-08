@@ -5,7 +5,7 @@ import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useDateParam } from "@/hooks/useDateParam";
 import { useExercises } from "@/hooks/useExercises";
-import { EXERCISE_CATEGORIES } from "@/utils/exercise-categories";
+import { EXERCISE_CATEGORIES } from "@/utils/exerciseCategories";
 import styles from "./RecordExerciseSelect.module.css";
 
 export function RecordExerciseSelectPage() {

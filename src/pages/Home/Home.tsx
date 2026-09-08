@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { useAuth } from "@/providers/AuthProvider";
-import titleStyles from "@/styles/brand-title.module.css";
+import titleStyles from "@/styles/brandTitle.module.css";
 import styles from "./Home.module.css";
 
 export function HomePage() {

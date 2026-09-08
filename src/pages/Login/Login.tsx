@@ -3,7 +3,7 @@ import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useAuth } from "@/providers/AuthProvider";
-import titleStyles from "@/styles/brand-title.module.css";
+import titleStyles from "@/styles/brandTitle.module.css";
 import styles from "./Login.module.css";
 
 export function LoginPage() {

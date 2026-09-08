@@ -23,7 +23,7 @@ import {
   EXERCISE_CATEGORIES,
   getExerciseCategory,
   isExerciseCategoryValue,
-} from "@/utils/exercise-categories";
+} from "@/utils/exerciseCategories";
 import styles from "./Exercises.module.css";
 
 const categoryCollection = createListCollection({

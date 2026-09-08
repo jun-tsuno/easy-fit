@@ -6,7 +6,7 @@ import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useDateParam } from "@/hooks/useDateParam";
 import { useExercises } from "@/hooks/useExercises";
 import { useWorkoutSetsByDate } from "@/hooks/useWorkoutSets";
-import { EXERCISE_CATEGORIES } from "@/utils/exercise-categories";
+import { EXERCISE_CATEGORIES } from "@/utils/exerciseCategories";
 import styles from "./Record.module.css";
 
 export function RecordListPage() {

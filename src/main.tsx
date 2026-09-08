@@ -8,8 +8,8 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { router } from "@/routes/router";
 import "./index.css";
-import "./lib/amplify-config";
-import { queryClient } from "./lib/query-client";
+import "./lib/amplifyConfig";
+import { queryClient } from "./lib/queryClient";
 import { system } from "./theme";
 
 const rootElement = document.getElementById("root");

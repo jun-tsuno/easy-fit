@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { client } from "@/lib/amplify-client";
+import { client } from "@/lib/amplifyClient";
 
 function bodyWeightQueryKey(date: string) {
   return ["bodyWeight", date];
