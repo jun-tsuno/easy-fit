@@ -132,7 +132,7 @@ export function RecordSetInputPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="outline" aria-label="種目選択に戻る" asChild>
+        <IconButton variant="ghost" aria-label="種目選択に戻る" asChild>
           <Link to={`/record/new?date=${date}`}>
             <LuArrowLeft />
           </Link>

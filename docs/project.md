@@ -14,9 +14,19 @@
 | バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
 | UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
-| アイコン | react-icons |
+| アイコン | react-icons（Lucide: `react-icons/lu`） |
 | トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
 | Lint/Format | Biome |
+
+### デザイン方針
+
+- ライトモードのみ（ダークモード・テーマ切替は廃止）
+- ベース背景 `#F2F2F2` / カード背面 `#FFF` + うっすらとした shadow（`--shadow-card`）
+- アクセントカラー `#CE0000`（Chakra の `brand` パレット = レッド）
+- 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）
+- フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
+- 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
+- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/` と「種目」`/exercises`
 
 ## データモデル（`amplify/data/resource.ts`）
 
@@ -40,10 +50,16 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 認証済みの場合は `/` にリダイレクト
 
 ### ホーム画面 `/`
-- アプリタイトル、種目管理へのアイコンボタン、テーマ切替、ログアウトボタン
-- 「トレーニングを記録」ボタン → `/record`
-- 「体重を記録」ボタン → `/body-weight`
-- ※Issue #3 でカレンダー中心の画面に置き換え予定
+- ヘッダー: アプリタイトル、ログアウトボタン（種目への導線は下部のグローバルメニューに移動）
+- カレンダーをメインコンテンツとして配置（`src/components/Calendar/Calendar.tsx`、日曜始まり・6週間固定表示）
+  - 月送り（前月/次月）と「今月」ボタン（当月以外を表示中のみ）で移動
+  - トレーニング記録がある日にはアクセントカラーの丸い点（ドット）を表示
+  - 体重記録がある日にはセル下部に体重値（`62.5kg` 形式）を表示
+  - 本日のセルを強調表示
+  - 日付タップでその日のトレーニング記録画面 `/record?date=<日付>` に遷移
+  - 表示中の月を含む6週間ぶんの `WorkoutSet` / `BodyWeight` を日付範囲でまとめて取得（`useWorkoutSetsInRange` / `useBodyWeightsInRange`）
+- 週の記録サマリー: 常に「今週」（本日を含む日〜土、カレンダーの表示月とは独立）の「トレーニング日数」「合計セット数」「総挙上量（Σ 重量×回数）」「体重（その週の最新記録）」。体重の値は `/body-weight?date=<本日>` へのリンク
+- 画面下部に固定表示の「本日のトレーニングを記録」ボタン → `/record?date=<本日>`
 
 ### 種目管理画面 `/exercises`
 - 種目名・カテゴリ（胸/背中/肩/腕/脚/有酸素/その他）を指定して種目を追加
@@ -52,10 +68,10 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - クエリパラメータ `?category=` で追加フォームのカテゴリを事前選択、`?from=` で戻り先を指定可能（記録画面からの「種目を追加」導線で使用）
 
 ### トレーニング記録一覧画面 `/record?date=YYYY-MM-DD`
-- 指定日（デフォルト当日）のトレーニング記録をカテゴリごとにセクション分けして表示
+- ページタイトルに対象日を表示（`9月8日(月)のトレーニング` 形式）。日付はカレンダーからの遷移で決まるため、画面内に日付ピッカーは持たない（デフォルトは当日）
+- 指定日のトレーニング記録をカテゴリごとにセクション分けして表示
 - 各種目は「60kg×10回 / 60kg×8回」のようにセット内容を要約表示、クリックでその種目のセット入力画面へ
 - ヘッダーの「+」ボタン → 種目選択画面 `/record/new?date=...`
-- 日付ピッカーで表示日を変更可能
 - 戻るボタンでホーム画面へ
 
 ### 種目選択画面 `/record/new?date=YYYY-MM-DD`
@@ -81,18 +97,23 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ```
 /login ──(ログイン成功)──> /
 
-/ (ホーム)
- ├─ 種目管理アイコン ──────────────> /exercises
- ├─ 「トレーニングを記録」 ────────> /record
- │                                     ├─ 「+」 ──────────> /record/new
- │                                     │                      ├─ 種目クリック ──> /record/new/:exerciseId
- │                                     │                      │                     └─ 戻る ──> /record/new
- │                                     │                      ├─ 種目0件のカテゴリ「種目を追加」──> /exercises?category=..&from=/record/new
- │                                     │                      │                                        └─ 保存後 ──> /record/new
- │                                     │                      └─ 戻る ──> /record
- │                                     └─ 種目クリック（記録済み） ──> /record/new/:exerciseId
- └─ 「体重を記録」 ───────────────> /body-weight
-                                        └─ 戻る ──> /
+グローバルメニュー（全認証済み画面の下部に常時表示）
+ ├─ ホーム ──> /
+ └─ 種目 ───> /exercises
+
+/ (ホーム / カレンダー)
+ ├─ カレンダーの日付タップ ────────> /record?date=<日付>
+ ├─ 「本日のトレーニングを記録」────> /record?date=<本日>
+ ├─ 週サマリーの体重リンク ────────> /body-weight?date=<本日>
+ │                                        └─ 戻る ──> /
+ └─ /record
+      ├─ 「+」 ──────────> /record/new
+      │                      ├─ 種目クリック ──> /record/new/:exerciseId
+      │                      │                     └─ 戻る ──> /record/new
+      │                      ├─ 種目0件のカテゴリ「種目を追加」──> /exercises?category=..&from=/record/new
+      │                      │                                        └─ 保存後 ──> /record/new
+      │                      └─ 戻る ──> /record
+      └─ 種目クリック（記録済み） ──> /record/new/:exerciseId
 ```
 
 ## 開発ルール

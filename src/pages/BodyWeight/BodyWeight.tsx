@@ -1,6 +1,6 @@
 import { Button, IconButton, Input } from "@chakra-ui/react";
 import { type FormEvent, useEffect, useState } from "react";
-import { LuArrowLeft } from "react-icons/lu";
+import { LuArrowLeft, LuScale } from "react-icons/lu";
 import { Link } from "react-router";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { toaster } from "@/components/Toaster/Toaster";
@@ -35,12 +35,15 @@ export function BodyWeightPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="outline" aria-label="ホームに戻る" asChild>
+        <IconButton variant="ghost" aria-label="ホームに戻る" asChild>
           <Link to="/">
             <LuArrowLeft />
           </Link>
         </IconButton>
-        <h1 className={styles.title}>体重記録</h1>
+        <h1 className={styles.title}>
+          <LuScale />
+          体重記録
+        </h1>
       </header>
 
       <div className={styles.dateField}>

@@ -6,6 +6,7 @@ import { LoginPage } from "@/pages/Login/Login";
 import { RecordListPage } from "@/pages/Record/Record";
 import { RecordExerciseSelectPage } from "@/pages/RecordExerciseSelect/RecordExerciseSelect";
 import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
+import { AppLayout } from "@/routes/AppLayout/AppLayout";
 import { ProtectedRoute } from "@/routes/ProtectedRoute/ProtectedRoute";
 
 export const router = createBrowserRouter([
@@ -17,28 +18,33 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
-        element: <HomePage />,
-      },
-      {
-        path: "/exercises",
-        element: <ExercisesPage />,
-      },
-      {
-        path: "/record",
-        element: <RecordListPage />,
-      },
-      {
-        path: "/record/new",
-        element: <RecordExerciseSelectPage />,
-      },
-      {
-        path: "/record/new/:exerciseId",
-        element: <RecordSetInputPage />,
-      },
-      {
-        path: "/body-weight",
-        element: <BodyWeightPage />,
+        element: <AppLayout />,
+        children: [
+          {
+            path: "/",
+            element: <HomePage />,
+          },
+          {
+            path: "/exercises",
+            element: <ExercisesPage />,
+          },
+          {
+            path: "/record",
+            element: <RecordListPage />,
+          },
+          {
+            path: "/record/new",
+            element: <RecordExerciseSelectPage />,
+          },
+          {
+            path: "/record/new/:exerciseId",
+            element: <RecordSetInputPage />,
+          },
+          {
+            path: "/body-weight",
+            element: <BodyWeightPage />,
+          },
+        ],
       },
     ],
   },
