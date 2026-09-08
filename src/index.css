@@ -1,21 +1,16 @@
 @import "@fontsource-variable/geist";
 
 :root {
-  --color-fg: oklch(0.145 0 0);
-  --color-fg-muted: oklch(0.556 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-bg-muted: oklch(0.97 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-accent: #10a894;
-}
-
-.dark {
-  --color-fg: oklch(0.985 0 0);
-  --color-fg-muted: oklch(0.708 0 0);
-  --color-border: oklch(1 0 0 / 10%);
-  --color-bg-muted: oklch(0.269 0 0);
-  --color-destructive: oklch(0.704 0.191 22.216);
-  --color-accent: #22c3aa;
+  --color-bg: #f2f2f2;
+  --color-card: #ffffff;
+  --color-fg: #1a1a1a;
+  --color-fg-muted: #6f6f6f;
+  --color-border: #e4e4e4;
+  --color-bg-muted: #ececec;
+  --color-destructive: #ec0000;
+  --color-accent: #ec0000;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 3px rgb(0 0 0 / 8%);
+  --radius-card: 0.75rem;
 }
 
 *,
@@ -27,4 +22,7 @@
 body {
   margin: 0;
   font-family: "Geist Variable", sans-serif;
+  font-weight: 500;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
 }

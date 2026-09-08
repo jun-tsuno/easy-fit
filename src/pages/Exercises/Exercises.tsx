@@ -9,7 +9,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
-import { LuArrowLeft, LuTrash2 } from "react-icons/lu";
+import { LuArrowLeft, LuDumbbell, LuTrash2 } from "react-icons/lu";
 import { Link, useSearchParams } from "react-router";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
@@ -139,7 +139,10 @@ export function ExercisesPage() {
             <LuArrowLeft />
           </Link>
         </IconButton>
-        <h1 className={styles.title}>種目管理</h1>
+        <h1 className={styles.title}>
+          <LuDumbbell />
+          種目管理
+        </h1>
       </header>
 
       <form onSubmit={handleSubmit} className={styles.form}>

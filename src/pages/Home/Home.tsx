@@ -1,10 +1,17 @@
 import { Button, IconButton, Spinner } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import { LuDumbbell, LuLogOut, LuNotebookPen } from "react-icons/lu";
+import {
+  LuCalendarCheck,
+  LuChevronRight,
+  LuLayers,
+  LuLogOut,
+  LuNotebookPen,
+  LuScale,
+  LuTrendingUp,
+} from "react-icons/lu";
 import { Link, useNavigate } from "react-router";
 import { Calendar } from "@/components/Calendar/Calendar";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
-import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { useBodyWeightsInRange } from "@/hooks/useBodyWeight";
 import { useWorkoutSetsInRange } from "@/hooks/useWorkoutSets";
 import { useAuth } from "@/providers/AuthProvider";
@@ -83,35 +90,29 @@ export function HomePage() {
     <PageContainer>
       <header className={styles.header}>
         <h1 className={titleStyles.title}>easy-fit</h1>
-        <div className={styles.headerActions}>
-          <IconButton variant="outline" aria-label="種目管理" asChild>
-            <Link to="/exercises">
-              <LuDumbbell />
-            </Link>
-          </IconButton>
-          <ThemeToggle />
-          <IconButton
-            variant="outline"
-            aria-label="ログアウト"
-            onClick={() => signOut()}
-          >
-            <LuLogOut />
-          </IconButton>
-        </div>
+        <IconButton
+          variant="ghost"
+          aria-label="ログアウト"
+          onClick={() => signOut()}
+        >
+          <LuLogOut />
+        </IconButton>
       </header>
 
       <main className={styles.main}>
-        <Calendar
-          year={visibleMonth.year}
-          month={visibleMonth.month}
-          selectedDate={today}
-          onSelectDate={(date) => navigate(`/record?date=${date}`)}
-          onMonthChange={(year, month) => setVisibleMonth({ year, month })}
-          markedDates={workoutDates}
-          annotations={calendarAnnotations}
-        />
+        <div className={styles.card}>
+          <Calendar
+            year={visibleMonth.year}
+            month={visibleMonth.month}
+            selectedDate={today}
+            onSelectDate={(date) => navigate(`/record?date=${date}`)}
+            onMonthChange={(year, month) => setVisibleMonth({ year, month })}
+            markedDates={workoutDates}
+            annotations={calendarAnnotations}
+          />
+        </div>
 
-        <section className={styles.summary}>
+        <section className={`${styles.card} ${styles.summary}`}>
           <h2 className={styles.summaryTitle}>
             今週の記録
             <span className={styles.summaryRange}>
@@ -126,28 +127,40 @@ export function HomePage() {
           ) : (
             <dl className={styles.summaryGrid}>
               <div className={styles.summaryItem}>
-                <dt className={styles.summaryLabel}>トレーニング</dt>
+                <dt className={styles.summaryLabel}>
+                  <LuCalendarCheck className={styles.summaryIcon} />
+                  トレーニング
+                </dt>
                 <dd className={styles.summaryValue}>
                   {weekSummary.trainingDays}
                   <span className={styles.summaryUnit}>日</span>
                 </dd>
               </div>
               <div className={styles.summaryItem}>
-                <dt className={styles.summaryLabel}>合計セット</dt>
+                <dt className={styles.summaryLabel}>
+                  <LuLayers className={styles.summaryIcon} />
+                  合計セット
+                </dt>
                 <dd className={styles.summaryValue}>
                   {weekSummary.totalSets}
                   <span className={styles.summaryUnit}>セット</span>
                 </dd>
               </div>
               <div className={styles.summaryItem}>
-                <dt className={styles.summaryLabel}>総挙上量</dt>
+                <dt className={styles.summaryLabel}>
+                  <LuTrendingUp className={styles.summaryIcon} />
+                  総挙上量
+                </dt>
                 <dd className={styles.summaryValue}>
                   {Math.round(weekSummary.totalVolume).toLocaleString()}
                   <span className={styles.summaryUnit}>kg</span>
                 </dd>
               </div>
               <div className={styles.summaryItem}>
-                <dt className={styles.summaryLabel}>体重</dt>
+                <dt className={styles.summaryLabel}>
+                  <LuScale className={styles.summaryIcon} />
+                  体重
+                </dt>
                 <dd className={styles.summaryValue}>
                   <Link
                     to={`/body-weight?date=${today}`}
@@ -161,6 +174,7 @@ export function HomePage() {
                     ) : (
                       <span className={styles.summaryUnit}>記録する</span>
                     )}
+                    <LuChevronRight className={styles.weightChevron} />
                   </Link>
                 </dd>
               </div>
@@ -170,7 +184,7 @@ export function HomePage() {
       </main>
 
       <div className={styles.recordBar}>
-        <Button size="lg" w="full" asChild>
+        <Button size="lg" w="full" boxShadow="lg" asChild>
           <Link to={`/record?date=${today}`}>
             <LuNotebookPen />
             本日のトレーニングを記録

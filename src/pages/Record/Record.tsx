@@ -1,5 +1,5 @@
 import { IconButton, Spinner } from "@chakra-ui/react";
-import { LuArrowLeft, LuPlus } from "react-icons/lu";
+import { LuArrowLeft, LuCalendarDays, LuPlus } from "react-icons/lu";
 import { Link } from "react-router";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
@@ -38,7 +38,8 @@ export function RecordListPage() {
             </Link>
           </IconButton>
           <h1 className={styles.title}>
-            {formatDateLabel(date)}のトレーニング
+            <LuCalendarDays />
+            {formatDateLabel(date)}
           </h1>
         </div>
         <IconButton aria-label="記録を追加" asChild>

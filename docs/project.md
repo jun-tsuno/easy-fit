@@ -14,9 +14,18 @@
 | バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
 | UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
-| アイコン | react-icons |
+| アイコン | react-icons（Lucide: `react-icons/lu`） |
 | トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
 | Lint/Format | Biome |
+
+### デザイン方針
+
+- ライトモードのみ（ダークモード・テーマ切替は廃止）
+- ベース背景 `#F2F2F2` / カード背面 `#FFF` + うっすらとした shadow（`--shadow-card`）
+- アクセントカラー `#EC0000`（Chakra の `brand` パレット = レッド）
+- フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
+- 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
+- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/` と「種目」`/exercises`
 
 ## データモデル（`amplify/data/resource.ts`）
 
@@ -40,7 +49,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 認証済みの場合は `/` にリダイレクト
 
 ### ホーム画面 `/`
-- ヘッダー: アプリタイトル、種目管理へのアイコンボタン、テーマ切替、ログアウトボタン
+- ヘッダー: アプリタイトル、ログアウトボタン（種目への導線は下部のグローバルメニューに移動）
 - カレンダーをメインコンテンツとして配置（`src/components/Calendar/Calendar.tsx`、日曜始まり・6週間固定表示）
   - 月送り（前月/次月）と「今月」ボタン（当月以外を表示中のみ）で移動
   - トレーニング記録がある日にはアクセントカラーの丸い点（ドット）を表示
@@ -87,8 +96,11 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ```
 /login ──(ログイン成功)──> /
 
+グローバルメニュー（全認証済み画面の下部に常時表示）
+ ├─ ホーム ──> /
+ └─ 種目 ───> /exercises
+
 / (ホーム / カレンダー)
- ├─ 種目管理アイコン ──────────────> /exercises
  ├─ カレンダーの日付タップ ────────> /record?date=<日付>
  ├─ 「本日のトレーニングを記録」────> /record?date=<本日>
  ├─ 週サマリーの体重リンク ────────> /body-weight?date=<本日>
