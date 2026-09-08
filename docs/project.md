@@ -22,7 +22,8 @@
 
 - ライトモードのみ（ダークモード・テーマ切替は廃止）
 - ベース背景 `#F2F2F2` / カード背面 `#FFF` + うっすらとした shadow（`--shadow-card`）
-- アクセントカラー `#EC0000`（Chakra の `brand` パレット = レッド）
+- アクセントカラー `#CE0000`（Chakra の `brand` パレット = レッド）
+- 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）
 - フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
 - 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
 - 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/` と「種目」`/exercises`

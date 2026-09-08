@@ -92,7 +92,6 @@
   align-items: center;
   gap: 0.75rem;
   border-radius: var(--radius-card);
-  border-left: 4px solid var(--color-border);
   background-color: var(--color-card);
   box-shadow: var(--shadow-card);
   padding: 0.75rem 0.875rem;

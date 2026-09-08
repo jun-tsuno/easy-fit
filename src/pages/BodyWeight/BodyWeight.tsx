@@ -35,7 +35,7 @@ export function BodyWeightPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="outline" aria-label="ホームに戻る" asChild>
+        <IconButton variant="ghost" aria-label="ホームに戻る" asChild>
           <Link to="/">
             <LuArrowLeft />
           </Link>

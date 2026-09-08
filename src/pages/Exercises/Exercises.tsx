@@ -21,7 +21,6 @@ import {
 import type { Exercise, ExerciseCategoryValue } from "@/types/exercise";
 import {
   EXERCISE_CATEGORIES,
-  getExerciseCategory,
   isExerciseCategoryValue,
 } from "@/utils/exerciseCategories";
 import styles from "./Exercises.module.css";
@@ -35,7 +34,6 @@ const categoryCollection = createListCollection({
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
   const deleteExercise = useDeleteExercise();
-  const category = getExerciseCategory(exercise.category);
 
   const handleDelete = async () => {
     await deleteExercise.mutateAsync(exercise.id);
@@ -43,7 +41,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
   };
 
   return (
-    <li className={styles.row} style={{ borderLeftColor: category.color }}>
+    <li className={styles.row}>
       <p className={styles.rowName}>{exercise.name}</p>
       <Dialog.Root
         role="alertdialog"
@@ -134,7 +132,7 @@ export function ExercisesPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="outline" aria-label="戻る" asChild>
+        <IconButton variant="ghost" aria-label="戻る" asChild>
           <Link to={backTo}>
             <LuArrowLeft />
           </Link>

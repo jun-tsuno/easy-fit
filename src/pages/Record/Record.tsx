@@ -32,7 +32,7 @@ export function RecordListPage() {
     <PageContainer>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <IconButton variant="outline" aria-label="ホームに戻る" asChild>
+          <IconButton variant="ghost" aria-label="ホームに戻る" asChild>
             <Link to="/">
               <LuArrowLeft />
             </Link>

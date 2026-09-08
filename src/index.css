@@ -7,8 +7,8 @@
   --color-fg-muted: #6f6f6f;
   --color-border: #e4e4e4;
   --color-bg-muted: #ececec;
-  --color-destructive: #ec0000;
-  --color-accent: #ec0000;
+  --color-destructive: #ce0000;
+  --color-accent: #ce0000;
   --shadow-card: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 3px rgb(0 0 0 / 8%);
   --radius-card: 0.75rem;
 }

@@ -15,7 +15,7 @@ export function RecordExerciseSelectPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="outline" aria-label="記録一覧に戻る" asChild>
+        <IconButton variant="ghost" aria-label="記録一覧に戻る" asChild>
           <Link to={`/record?date=${date}`}>
             <LuArrowLeft />
           </Link>
