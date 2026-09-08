@@ -20,6 +20,22 @@ export function useBodyWeightByDate(date: string) {
   });
 }
 
+async function fetchBodyWeightsInRange(start: string, end: string) {
+  const { data, errors } = await client.models.BodyWeight.list({
+    filter: { and: [{ date: { ge: start } }, { date: { le: end } }] },
+    limit: 1000,
+  });
+  if (errors) throw new Error(errors.map((error) => error.message).join(", "));
+  return data;
+}
+
+export function useBodyWeightsInRange(start: string, end: string) {
+  return useQuery({
+    queryKey: ["bodyWeight", "range", start, end],
+    queryFn: () => fetchBodyWeightsInRange(start, end),
+  });
+}
+
 type SaveBodyWeightInput = {
   id: string | null;
   weight: number;
