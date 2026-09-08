@@ -11,20 +11,20 @@ import {
 import { type FormEvent, useState } from "react";
 import { LuArrowLeft, LuTrash2 } from "react-icons/lu";
 import { Link, useSearchParams } from "react-router";
-import { CategoryDot } from "@/components/category-dot";
-import { PageContainer } from "@/components/page-container";
+import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
 import {
   useCreateExercise,
   useDeleteExercise,
   useExercises,
-} from "@/hooks/use-exercises";
+} from "@/hooks/useExercises";
 import type { Exercise, ExerciseCategoryValue } from "@/types/exercise";
 import {
   EXERCISE_CATEGORIES,
   getExerciseCategory,
   isExerciseCategoryValue,
 } from "@/utils/exercise-categories";
-import styles from "./exercises.module.css";
+import styles from "./Exercises.module.css";
 
 const categoryCollection = createListCollection({
   items: EXERCISE_CATEGORIES,

@@ -1,6 +1,6 @@
 import { IconButton } from "@chakra-ui/react";
 import { LuMoon, LuSun } from "react-icons/lu";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();

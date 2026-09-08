@@ -1,4 +1,4 @@
-import styles from "./category-dot.module.css";
+import styles from "./CategoryDot.module.css";
 
 function CategoryDot({
   color,

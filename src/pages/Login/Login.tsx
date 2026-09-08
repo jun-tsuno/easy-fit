@@ -1,10 +1,10 @@
 import { Button, Input } from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router";
-import { useAuth } from "@/components/auth-provider";
-import { PageContainer } from "@/components/page-container";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
+import { useAuth } from "@/providers/AuthProvider";
 import titleStyles from "@/styles/brand-title.module.css";
-import styles from "./login.module.css";
+import styles from "./Login.module.css";
 
 export function LoginPage() {
   const { status, signIn } = useAuth();

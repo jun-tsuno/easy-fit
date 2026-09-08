@@ -1,7 +1,7 @@
 import { Spinner } from "@chakra-ui/react";
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "@/components/auth-provider";
-import styles from "./protected-route.module.css";
+import { useAuth } from "@/providers/AuthProvider";
+import styles from "./ProtectedRoute.module.css";
 
 export function ProtectedRoute() {
   const { status } = useAuth();

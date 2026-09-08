@@ -15,7 +15,7 @@
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
 | UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
 | アイコン | react-icons |
-| トースト通知 | Chakra UI の `Toaster`（`src/components/ui/toaster.tsx`） |
+| トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
 | Lint/Format | Biome |
 
 ## データモデル（`amplify/data/resource.ts`）
@@ -98,5 +98,9 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ## 開発ルール
 
 - 機能ごとに feature ブランチを切り、PR を作成する。`main` への直接 push は行わない
+- ディレクトリ構成:
+  - コンポーネントはファイル・ディレクトリ名をアッパーキャメルにし、`Xxx/Xxx.tsx` + `Xxx.module.css` の単位で配置する（`pages` 配下も同様）
+  - `src/components` は UI コンポーネント専用。ルーティングは `src/routes`、Provider は `src/providers` に定義する
+  - hooks のファイル名は `useXxx.ts` 形式にする
 - Issue #6 着手時に `WorkoutSet` へ `exerciseId + date` のセカンダリインデックスを追加する（当初 #8 で予定していたが #6 に変更済み）
 - 実データ（Cognito + AppSync）を用いた動作確認はサンドボックス環境では実施できないため、各PRのテスト計画に実機確認項目を明記する

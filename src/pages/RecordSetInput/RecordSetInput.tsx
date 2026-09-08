@@ -2,17 +2,17 @@ import { Button, IconButton, Input, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { LuArrowLeft, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Link, useParams } from "react-router";
-import { PageContainer } from "@/components/page-container";
-import { toaster } from "@/components/ui/toaster";
-import { useDateParam } from "@/hooks/use-date-param";
-import { useExercises } from "@/hooks/use-exercises";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
+import { toaster } from "@/components/Toaster/Toaster";
+import { useDateParam } from "@/hooks/useDateParam";
+import { useExercises } from "@/hooks/useExercises";
 import {
   useCreateWorkoutSet,
   useDeleteWorkoutSet,
   useUpdateWorkoutSet,
   useWorkoutSetsByExercise,
-} from "@/hooks/use-workout-sets";
-import styles from "./record-set-input.module.css";
+} from "@/hooks/useWorkoutSets";
+import styles from "./RecordSetInput.module.css";
 
 type SetRow = {
   key: string;

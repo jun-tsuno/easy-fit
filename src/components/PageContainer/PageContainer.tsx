@@ -1,5 +1,5 @@
 import type * as React from "react";
-import styles from "./page-container.module.css";
+import styles from "./PageContainer.module.css";
 
 /**
  * 全ページ共通のレイアウトコンテナ。

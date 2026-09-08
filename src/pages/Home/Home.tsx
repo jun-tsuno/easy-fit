@@ -1,13 +1,13 @@
 import { Button, IconButton } from "@chakra-ui/react";
 import { LuDumbbell, LuLogOut, LuNotebookPen, LuWeight } from "react-icons/lu";
 import { Link } from "react-router";
-import styles from "@/App.module.css";
-import { useAuth } from "@/components/auth-provider";
-import { PageContainer } from "@/components/page-container";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
+import { useAuth } from "@/providers/AuthProvider";
 import titleStyles from "@/styles/brand-title.module.css";
+import styles from "./Home.module.css";
 
-function App() {
+export function HomePage() {
   const { signOut } = useAuth();
 
   return (
@@ -47,5 +47,3 @@ function App() {
     </PageContainer>
   );
 }
-
-export default App;

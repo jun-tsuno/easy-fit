@@ -2,14 +2,11 @@ import { Button, IconButton, Input } from "@chakra-ui/react";
 import { type FormEvent, useEffect, useState } from "react";
 import { LuArrowLeft } from "react-icons/lu";
 import { Link } from "react-router";
-import { PageContainer } from "@/components/page-container";
-import { toaster } from "@/components/ui/toaster";
-import {
-  useBodyWeightByDate,
-  useSaveBodyWeight,
-} from "@/hooks/use-body-weight";
-import { useDateParam } from "@/hooks/use-date-param";
-import styles from "./body-weight.module.css";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
+import { toaster } from "@/components/Toaster/Toaster";
+import { useBodyWeightByDate, useSaveBodyWeight } from "@/hooks/useBodyWeight";
+import { useDateParam } from "@/hooks/useDateParam";
+import styles from "./BodyWeight.module.css";
 
 export function BodyWeightPage() {
   const [date, setDate] = useDateParam();

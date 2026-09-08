@@ -3,13 +3,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
-import { AuthProvider } from "@/components/auth-provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import { AppToaster } from "@/components/ui/toaster";
+import { AppToaster } from "@/components/Toaster/Toaster";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { router } from "@/routes/router";
 import "./index.css";
 import "./lib/amplify-config";
 import { queryClient } from "./lib/query-client";
-import { router } from "./router";
 import { system } from "./theme";
 
 const rootElement = document.getElementById("root");

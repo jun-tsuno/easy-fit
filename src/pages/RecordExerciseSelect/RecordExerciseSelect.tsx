@@ -1,12 +1,12 @@
 import { Button, IconButton, Spinner } from "@chakra-ui/react";
 import { LuArrowLeft, LuChevronRight, LuPlus } from "react-icons/lu";
 import { Link } from "react-router";
-import { CategoryDot } from "@/components/category-dot";
-import { PageContainer } from "@/components/page-container";
-import { useDateParam } from "@/hooks/use-date-param";
-import { useExercises } from "@/hooks/use-exercises";
+import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
+import { PageContainer } from "@/components/PageContainer/PageContainer";
+import { useDateParam } from "@/hooks/useDateParam";
+import { useExercises } from "@/hooks/useExercises";
 import { EXERCISE_CATEGORIES } from "@/utils/exercise-categories";
-import styles from "./record-exercise-select.module.css";
+import styles from "./RecordExerciseSelect.module.css";
 
 export function RecordExerciseSelectPage() {
   const [date] = useDateParam();

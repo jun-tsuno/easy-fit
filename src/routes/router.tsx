@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router";
-import { ProtectedRoute } from "@/components/protected-route";
-import App from "./App";
-import { BodyWeightPage } from "./pages/body-weight";
-import { ExercisesPage } from "./pages/exercises";
-import { LoginPage } from "./pages/login";
-import { RecordListPage } from "./pages/record";
-import { RecordExerciseSelectPage } from "./pages/record-exercise-select";
-import { RecordSetInputPage } from "./pages/record-set-input";
+import { BodyWeightPage } from "@/pages/BodyWeight/BodyWeight";
+import { ExercisesPage } from "@/pages/Exercises/Exercises";
+import { HomePage } from "@/pages/Home/Home";
+import { LoginPage } from "@/pages/Login/Login";
+import { RecordListPage } from "@/pages/Record/Record";
+import { RecordExerciseSelectPage } from "@/pages/RecordExerciseSelect/RecordExerciseSelect";
+import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
+import { ProtectedRoute } from "@/routes/ProtectedRoute/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <App />,
+        element: <HomePage />,
       },
       {
         path: "/exercises",
