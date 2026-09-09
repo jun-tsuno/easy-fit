@@ -66,11 +66,12 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 画面下部に固定表示の「本日のトレーニングを記録」ボタン → `/record?date=<本日>`
 
 ### グラフ画面 `/stats`
-- 画面上部に期間粒度の切替（週＝直近12週 / 月＝直近12ヶ月 / 年＝直近5年）。`SegmentGroup` で選択、既定は「月」
-- 期間粒度ごとにデータをバケットに集計し、折れ線グラフ（`StatsLineChart` = `@chakra-ui/charts`）で推移を表示
+- 画面上部で振り返る期間を切替（週＝直近7日・日単位 / 月＝直近30日・日単位 / 年＝直近12ヶ月・月単位）。`SegmentGroup` で選択、既定は「月」
+- 期間内をバケット（日 or 月）に区切って集計し、折れ線グラフ（`StatsLineChart` = `@chakra-ui/charts`）で推移を表示
 - **体重の推移**: バケットごとの体重の平均値を折れ線表示。カード右上に期間全体の平均値
 - **種目別の記録推移**: 種目セレクト＋指標切替（最大重量 / 総挙上量）。選択種目のセット記録をバケット集計して折れ線表示。カード右上に期間全体の平均値
   - 種目別クエリは `WorkoutSet` の `listWorkoutSetsByExerciseDate`（`exerciseId + date` GSI）を使用
+- バケット生成は `getStatsBuckets`（`src/utils/date.ts`）、集計は `src/utils/stats.ts`
 - 記録のないバケットは点を打たず線でつなぐ。データ0件・種目未登録時は各カードにメッセージ表示
 - ルート（recharts 込み）は `React.lazy` で遅延読み込み
 
