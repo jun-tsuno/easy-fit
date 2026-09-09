@@ -6,7 +6,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
-import { LuChartLine, LuScale } from "react-icons/lu";
+import { LuDumbbell, LuScale } from "react-icons/lu";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import {
   StatsLineChart,
@@ -22,7 +22,7 @@ import {
   average,
   type WorkoutMetric,
 } from "@/utils/stats";
-import styles from "./Stats.module.css";
+import styles from "./History.module.css";
 
 const PERIOD_ITEMS: { value: StatsPeriod; label: string }[] = [
   { value: "week", label: "週" },
@@ -39,8 +39,8 @@ function formatKg(value: number | null): string {
   return value == null ? "—" : `${value.toLocaleString()}kg`;
 }
 
-export function StatsPage() {
-  const [period, setPeriod] = useState<StatsPeriod>("month");
+export function HistoryPage() {
+  const [period, setPeriod] = useState<StatsPeriod>("week");
 
   const buckets = useMemo(() => getStatsBuckets(period), [period]);
   const range = useMemo(
@@ -54,10 +54,7 @@ export function StatsPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          <LuChartLine />
-          グラフ
-        </h1>
+        <h1 className={styles.title}>履歴</h1>
       </header>
 
       <SegmentGroup.Root
@@ -79,12 +76,12 @@ export function StatsPage() {
       </SegmentGroup.Root>
 
       <main className={styles.main}>
-        <BodyWeightSection
+        <ExerciseSection
           buckets={buckets}
           rangeStart={range.start}
           rangeEnd={range.end}
         />
-        <ExerciseSection
+        <BodyWeightSection
           buckets={buckets}
           rangeStart={range.start}
           rangeEnd={range.end}
@@ -186,7 +183,7 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
     <section className={styles.section}>
       <div className={styles.sectionHead}>
         <h2 className={styles.sectionTitle}>
-          <LuChartLine className={styles.sectionIcon} />
+          <LuDumbbell className={styles.sectionIcon} />
           種目別の記録推移
         </h2>
         <p className={styles.sectionStat}>

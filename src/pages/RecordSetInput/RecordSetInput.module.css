@@ -62,6 +62,13 @@
   color: var(--color-fg-muted);
 }
 
-.addButton {
-  margin-top: 0.5rem;
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.actions button {
+  width: 100%;
 }

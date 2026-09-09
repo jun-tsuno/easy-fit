@@ -21,7 +21,7 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 4rem;
   margin-top: 1.5rem;
 }
 

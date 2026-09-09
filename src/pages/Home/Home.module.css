@@ -112,5 +112,5 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 28rem;
-  padding-inline: 1rem;
+  padding-inline: 16px;
 }

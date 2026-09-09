@@ -1,6 +1,8 @@
 @import "@fontsource-variable/geist";
 
 :root {
+  /* 基準フォントサイズ 17px（rem の基準）。全体を少し大きめに */
+  font-size: 106.25%;
   --color-bg: #ffffff;
   --color-card: #ffffff;
   --color-fg: #1a1a1a;

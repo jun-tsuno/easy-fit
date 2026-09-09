@@ -10,10 +10,10 @@ import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
 import { AppLayout } from "@/routes/AppLayout/AppLayout";
 import { ProtectedRoute } from "@/routes/ProtectedRoute/ProtectedRoute";
 
-// グラフ画面はチャートライブラリ(recharts)を含み重いため遅延読み込みする
-const StatsPage = lazy(() =>
-  import("@/pages/Stats/Stats").then((module) => ({
-    default: module.StatsPage,
+// 履歴画面はチャートライブラリ(recharts)を含み重いため遅延読み込みする
+const HistoryPage = lazy(() =>
+  import("@/pages/History/History").then((module) => ({
+    default: module.HistoryPage,
   })),
 );
 
@@ -37,10 +37,10 @@ export const router = createBrowserRouter([
             element: <ExercisesPage />,
           },
           {
-            path: "/stats",
+            path: "/history",
             element: (
               <Suspense fallback={null}>
-                <StatsPage />
+                <HistoryPage />
               </Suspense>
             ),
           },
