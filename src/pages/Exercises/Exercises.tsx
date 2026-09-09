@@ -52,6 +52,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
           <IconButton
             variant="ghost"
             size="sm"
+            colorPalette="red"
             aria-label={`${exercise.name}を削除`}
           >
             <LuTrash2 />

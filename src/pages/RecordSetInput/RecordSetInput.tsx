@@ -180,6 +180,7 @@ export function RecordSetInputPage() {
               <IconButton
                 variant="ghost"
                 size="sm"
+                colorPalette="red"
                 aria-label="セットを削除"
                 onClick={() => handleDeleteRow(row.key)}
               >
