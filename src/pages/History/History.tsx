@@ -132,7 +132,11 @@ function BodyWeightSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
       ) : isError ? (
         <p className={styles.error}>体重記録の取得に失敗しました。</p>
       ) : hasData ? (
-        <StatsLineChart data={points} formatTick={(v) => `${v}`} />
+        <StatsLineChart
+          data={points}
+          color="var(--color-secondary)"
+          formatTick={(v) => `${v}`}
+        />
       ) : (
         <p className={styles.emptyText}>この期間の体重記録はありません。</p>
       )}

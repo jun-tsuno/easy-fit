@@ -11,7 +11,9 @@
   --color-divider: #ececec;
   --color-bg-muted: #f2f2f2;
   --color-destructive: #ce0000;
-  --color-accent: #ce0000;
+  /* プライマリ / セカンダリ */
+  --color-accent: #0017c1;
+  --color-secondary: #9db7f9;
   --radius-card: 0.75rem;
 }
 
