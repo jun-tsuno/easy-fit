@@ -33,7 +33,7 @@ export function StatsLineChart({
   });
 
   return (
-    <Chart.Root h="13rem" chart={chart}>
+    <Chart.Root h="14rem" chart={chart}>
       <LineChart data={chart.data} margin={{ left: 0, right: 12, top: 8 }}>
         <CartesianGrid stroke={chart.color("border")} vertical={false} />
         <XAxis
@@ -41,7 +41,7 @@ export function StatsLineChart({
           tickLine={false}
           dataKey={chart.key("label")}
           stroke={chart.color("border")}
-          tick={{ fontSize: 11, fill: chart.color("fg.muted") }}
+          tick={{ fontSize: 12, fill: chart.color("fg.muted") }}
           interval="preserveStartEnd"
           minTickGap={12}
         />
@@ -50,7 +50,7 @@ export function StatsLineChart({
           tickLine={false}
           width={44}
           stroke={chart.color("border")}
-          tick={{ fontSize: 11, fill: chart.color("fg.muted") }}
+          tick={{ fontSize: 12, fill: chart.color("fg.muted") }}
           domain={["dataMin - 1", "dataMax + 1"]}
           tickFormatter={
             formatTick

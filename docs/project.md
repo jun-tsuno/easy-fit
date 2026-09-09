@@ -26,7 +26,9 @@
 - アクセントカラー `#CE0000`（Chakra の `brand` パレット = レッド）
 - 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）
 - フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
-- 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
+- 画面左右の余白は 16px（`PageContainer` / 固定バーの `padding-inline: 1rem`）
+- 本文の基準サイズは 15px（`0.9375rem`）、補足テキストは 13px（`0.8125rem`）
+- 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約。グレー文字は `--color-fg-muted`（`#545454`、コントラスト確保のため濃いめ）
 - 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/`、「種目」`/exercises`、「グラフ」`/stats`
 
 ## データモデル（`amplify/data/resource.ts`）

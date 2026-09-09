@@ -62,6 +62,8 @@ export function StatsPage() {
 
       <SegmentGroup.Root
         className={styles.periodToggle}
+        size="lg"
+        width="full"
         value={period}
         onValueChange={(details) => {
           if (details.value) setPeriod(details.value as StatsPeriod);
@@ -69,7 +71,7 @@ export function StatsPage() {
       >
         <SegmentGroup.Indicator />
         {PERIOD_ITEMS.map((item) => (
-          <SegmentGroup.Item key={item.value} value={item.value}>
+          <SegmentGroup.Item key={item.value} value={item.value} flex="1">
             <SegmentGroup.ItemText>{item.label}</SegmentGroup.ItemText>
             <SegmentGroup.ItemHiddenInput />
           </SegmentGroup.Item>
@@ -207,7 +209,7 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
               collection={collection}
               value={exerciseId ? [exerciseId] : []}
               onValueChange={(details) => setExerciseId(details.value[0] ?? "")}
-              size="sm"
+              size="md"
             >
               <Select.Control>
                 <Select.Trigger>
@@ -232,7 +234,7 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
             </Select.Root>
 
             <SegmentGroup.Root
-              size="sm"
+              size="md"
               value={metric}
               onValueChange={(details) => {
                 if (details.value) setMetric(details.value as WorkoutMetric);
@@ -240,7 +242,7 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
             >
               <SegmentGroup.Indicator />
               {METRIC_ITEMS.map((item) => (
-                <SegmentGroup.Item key={item.value} value={item.value}>
+                <SegmentGroup.Item key={item.value} value={item.value} flex="1">
                   <SegmentGroup.ItemText>{item.label}</SegmentGroup.ItemText>
                   <SegmentGroup.ItemHiddenInput />
                 </SegmentGroup.Item>
