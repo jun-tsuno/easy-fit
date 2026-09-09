@@ -24,9 +24,11 @@
 - ライトモードのみ（ダークモード・テーマ切替は廃止）
 - 背景は全画面 `#FFF`。カード（白背面 + shadow）は使わず、要素はフラットに配置する
 - セクション・リスト項目の区切りは余白（大きめ）と 1px の divider（`--color-divider`）で表現する
-- プライマリカラー `#3460FB`（青。`--color-accent` / Chakra `brand` パレットの 500）。多用せず、主にプライマリボタン・当日セル・記録アイコン・種目グラフに限定
-- セカンダリカラー `#9DB7F9`（淡い青。`--color-secondary` / `brand` パレットの 300）。体重グラフの折れ線などに使用
-- 破壊的操作（削除・ゴミ箱アイコン）は `--color-destructive` `#CE0000`（赤）。該当の `IconButton` には `colorPalette="red"` を付ける
+- プライマリカラー `#FF7628`（オレンジ。`--color-accent` / Chakra `brand` パレットの 500）。プライマリボタン・当日セル・記録アイコン・種目グラフ・アクティブタブに限定
+- セカンダリカラー `#FFA66D`（淡いオレンジ。`--color-secondary` / `brand` パレットの 300）。体重グラフの折れ線などに使用
+- プライマリ / セカンダリは**どちらもアクセント色**。キャンセルなど中立的なボタンには使わず `colorPalette="gray"` にする
+- オレンジ面の上の文字は白だとコントラスト不足のため濃色 `--color-on-accent` `#3A1A06`（Chakra は `brand.contrast`）。白背景に載せるアクセント文字は `brand.fg` = `brand.700`
+- 破壊的操作（削除・ゴミ箱アイコン）は `--color-destructive` `#CE0000`（赤）。該当の `Button` / `IconButton` には `colorPalette="red"` を付ける
 - 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）。トップレベルのタブ画面（ホーム / 履歴 / 種目）には戻るボタンを置かない
 - フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
 - 画面左右の余白は 16px（`PageContainer` / 固定バーの `padding-inline: 16px`）

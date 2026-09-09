@@ -75,7 +75,11 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
               </Dialog.Body>
               <Dialog.Footer>
                 <Dialog.ActionTrigger asChild>
-                  <Button variant="outline" disabled={deleteExercise.isPending}>
+                  <Button
+                    variant="outline"
+                    colorPalette="gray"
+                    disabled={deleteExercise.isPending}
+                  >
                     キャンセル
                   </Button>
                 </Dialog.ActionTrigger>

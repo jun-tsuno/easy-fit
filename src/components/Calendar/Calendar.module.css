@@ -83,7 +83,7 @@
 .cell[data-selected]:hover {
   background-color: var(--color-accent);
   border-color: transparent;
-  color: #fff;
+  color: var(--color-on-accent);
 }
 
 .dayNumber {
@@ -106,5 +106,5 @@
 }
 
 .cell[data-selected] .mark {
-  color: #fff;
+  color: var(--color-on-accent);
 }

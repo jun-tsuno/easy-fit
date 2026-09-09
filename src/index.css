@@ -11,9 +11,11 @@
   --color-divider: #ececec;
   --color-bg-muted: #f2f2f2;
   --color-destructive: #ce0000;
-  /* プライマリ / セカンダリ */
-  --color-accent: #3460fb;
-  --color-secondary: #9db7f9;
+  /* プライマリ / セカンダリ（どちらもアクセント。中立要素には使わない） */
+  --color-accent: #ff7628;
+  --color-secondary: #ffa66d;
+  /* アクセント面の上に載せる文字色 */
+  --color-on-accent: #3a1a06;
   --radius-card: 0.75rem;
 }
 

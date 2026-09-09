@@ -193,6 +193,7 @@ export function RecordSetInputPage() {
           <div className={styles.actions}>
             <Button
               variant="outline"
+              colorPalette="gray"
               onClick={handleAddRow}
               disabled={saveSets.isPending}
             >

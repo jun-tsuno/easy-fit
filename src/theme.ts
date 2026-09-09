@@ -18,19 +18,19 @@ const config = defineConfig({
         body: { value: `"Geist Variable", sans-serif` },
       },
       colors: {
-        // プライマリ #3460FB（500） / セカンダリ #9DB7F9（300）
+        // プライマリ #FF7628（500） / セカンダリ #FFA66D（300）
         brand: {
-          50: { value: "#eef2ff" },
-          100: { value: "#dde5ff" },
-          200: { value: "#c2d0fe" },
-          300: { value: "#9db7f9" },
-          400: { value: "#6486fb" },
-          500: { value: "#3460fb" },
-          600: { value: "#2249e6" },
-          700: { value: "#1c3ac4" },
-          800: { value: "#1c349e" },
-          900: { value: "#1d327d" },
-          950: { value: "#161f4c" },
+          50: { value: "#fff3ec" },
+          100: { value: "#ffe3d3" },
+          200: { value: "#ffc7a5" },
+          300: { value: "#ffa66d" },
+          400: { value: "#ff8c45" },
+          500: { value: "#ff7628" },
+          600: { value: "#ea5c12" },
+          700: { value: "#c2490c" },
+          800: { value: "#9a3c12" },
+          900: { value: "#7c3413" },
+          950: { value: "#431807" },
         },
       },
     },
@@ -38,8 +38,10 @@ const config = defineConfig({
       colors: {
         brand: {
           solid: { value: "{colors.brand.500}" },
-          contrast: { value: "white" },
-          fg: { value: "{colors.brand.600}" },
+          // オレンジ面は白文字だとコントラスト不足のため濃色を載せる
+          contrast: { value: "#3a1a06" },
+          // 白背景で読める濃さ
+          fg: { value: "{colors.brand.700}" },
           muted: { value: "{colors.brand.100}" },
           subtle: { value: "{colors.brand.50}" },
           emphasized: { value: "{colors.brand.200}" },
