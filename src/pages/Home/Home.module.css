@@ -9,22 +9,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
   /* 固定表示の記録ボタン + グローバルメニューぶんの余白 */
   padding-bottom: 4.5rem;
-}
-
-.card {
-  background-color: var(--color-card);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 1rem;
 }
 
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+  border-top: 1px solid var(--color-divider);
+  padding-top: 1.75rem;
 }
 
 .summaryTitle {
@@ -88,7 +83,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.125rem;
-  color: var(--color-accent);
+  color: var(--color-fg);
   text-decoration: none;
 }
 
@@ -100,6 +95,7 @@
 .weightChevron {
   width: 1rem;
   height: 1rem;
+  color: var(--color-fg-muted);
 }
 
 .loadingRow {

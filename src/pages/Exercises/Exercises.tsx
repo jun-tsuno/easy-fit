@@ -9,8 +9,8 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
-import { LuArrowLeft, LuDumbbell, LuTrash2 } from "react-icons/lu";
-import { Link, useSearchParams } from "react-router";
+import { LuDumbbell, LuTrash2 } from "react-icons/lu";
+import { useNavigate, useSearchParams } from "react-router";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import {
@@ -96,8 +96,10 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
 
 export function ExercisesPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialCategory = searchParams.get("category");
-  const backTo = searchParams.get("from") ?? "/";
+  // 記録フローから「種目を追加」で来た場合の戻り先
+  const returnTo = searchParams.get("from");
 
   const { data: exercises, isPending, isError } = useExercises();
   const createExercise = useCreateExercise();
@@ -114,6 +116,7 @@ export function ExercisesPage() {
     await createExercise.mutateAsync({ name: name.trim(), category });
     setName("");
     setCategory("");
+    if (returnTo) navigate(returnTo);
   };
 
   const grouped = EXERCISE_CATEGORIES.map((cat) => ({
@@ -132,11 +135,6 @@ export function ExercisesPage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <IconButton variant="ghost" aria-label="戻る" asChild>
-          <Link to={backTo}>
-            <LuArrowLeft />
-          </Link>
-        </IconButton>
         <h1 className={styles.title}>
           <LuDumbbell />
           種目管理

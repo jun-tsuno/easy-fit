@@ -1,5 +1,10 @@
 import { IconButton } from "@chakra-ui/react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import {
+  LuChevronLeft,
+  LuChevronRight,
+  LuDumbbell,
+  LuScale,
+} from "react-icons/lu";
 import {
   addMonths,
   formatMonthLabel,
@@ -19,10 +24,10 @@ type CalendarProps = {
   selectedDate: string;
   onSelectDate: (date: string) => void;
   onMonthChange: (year: number, month: number) => void;
-  /** 丸い点(ドット)を表示する日付("YYYY-MM-DD") */
-  markedDates: Set<string>;
-  /** 日付セルに添える補足テキスト(体重など) */
-  annotations?: Map<string, string>;
+  /** トレーニング記録がある日付("YYYY-MM-DD") */
+  workoutDates: Set<string>;
+  /** 体重記録がある日付("YYYY-MM-DD") */
+  weightDates: Set<string>;
 };
 
 function Calendar({
@@ -31,8 +36,8 @@ function Calendar({
   selectedDate,
   onSelectDate,
   onMonthChange,
-  markedDates,
-  annotations,
+  workoutDates,
+  weightDates,
 }: CalendarProps) {
   const today = getTodayDateString();
   const now = new Date();
@@ -98,7 +103,8 @@ function Calendar({
           const isCurrentMonth = day.getMonth() === month - 1;
           const isToday = dateString === today;
           const isSelected = dateString === selectedDate;
-          const annotation = annotations?.get(dateString);
+          const hasWorkout = workoutDates.has(dateString);
+          const hasWeight = weightDates.has(dateString);
 
           return (
             <button
@@ -113,13 +119,17 @@ function Calendar({
               onClick={() => onSelectDate(dateString)}
             >
               <span className={styles.dayNumber}>{day.getDate()}</span>
-              {annotation && (
-                <span className={styles.annotation}>{annotation}</span>
-              )}
-              <span
-                className={styles.dot}
-                data-visible={markedDates.has(dateString) || undefined}
-              />
+              <span className={styles.marks}>
+                {hasWorkout && (
+                  <LuDumbbell
+                    className={styles.mark}
+                    aria-label="トレーニング記録あり"
+                  />
+                )}
+                {hasWeight && (
+                  <LuScale className={styles.mark} aria-label="体重記録あり" />
+                )}
+              </span>
             </button>
           );
         })}
