@@ -4,17 +4,16 @@ import {
   LuCalendarCheck,
   LuChevronRight,
   LuLayers,
-  LuLogOut,
   LuNotebookPen,
   LuScale,
   LuTrendingUp,
+  LuUser,
 } from "react-icons/lu";
 import { Link, useNavigate } from "react-router";
 import { Calendar } from "@/components/Calendar/Calendar";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useBodyWeightsInRange } from "@/hooks/useBodyWeight";
 import { useWorkoutSetsInRange } from "@/hooks/useWorkoutSets";
-import { useAuth } from "@/providers/AuthProvider";
 import titleStyles from "@/styles/brandTitle.module.css";
 import {
   formatShortDate,
@@ -26,7 +25,6 @@ import {
 import styles from "./Home.module.css";
 
 export function HomePage() {
-  const { signOut } = useAuth();
   const navigate = useNavigate();
   const today = getTodayDateString();
 
@@ -87,12 +85,10 @@ export function HomePage() {
     <PageContainer>
       <header className={styles.header}>
         <h1 className={titleStyles.title}>easy-fit</h1>
-        <IconButton
-          variant="ghost"
-          aria-label="ログアウト"
-          onClick={() => signOut()}
-        >
-          <LuLogOut />
+        <IconButton variant="ghost" aria-label="マイページ" asChild>
+          <Link to="/mypage">
+            <LuUser />
+          </Link>
         </IconButton>
       </header>
 
