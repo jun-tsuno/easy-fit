@@ -118,13 +118,13 @@ function BodyWeightSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
   const hasData = points.some((point) => point.value != null);
 
   return (
-    <section className={styles.card}>
-      <div className={styles.cardHead}>
-        <h2 className={styles.cardTitle}>
-          <LuScale className={styles.cardIcon} />
+    <section className={styles.section}>
+      <div className={styles.sectionHead}>
+        <h2 className={styles.sectionTitle}>
+          <LuScale className={styles.sectionIcon} />
           体重の推移
         </h2>
-        <p className={styles.cardStat}>
+        <p className={styles.sectionStat}>
           平均 <strong>{formatKg(avg)}</strong>
         </p>
       </div>
@@ -183,13 +183,13 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
   const hasExercises = (exercises?.length ?? 0) > 0;
 
   return (
-    <section className={styles.card}>
-      <div className={styles.cardHead}>
-        <h2 className={styles.cardTitle}>
-          <LuChartLine className={styles.cardIcon} />
+    <section className={styles.section}>
+      <div className={styles.sectionHead}>
+        <h2 className={styles.sectionTitle}>
+          <LuChartLine className={styles.sectionIcon} />
           種目別の記録推移
         </h2>
-        <p className={styles.cardStat}>
+        <p className={styles.sectionStat}>
           平均 <strong>{formatKg(avg)}</strong>
         </p>
       </div>
