@@ -34,7 +34,11 @@ export function StatsLineChart({
 
   return (
     <Chart.Root h="14rem" chart={chart}>
-      <LineChart data={chart.data} margin={{ left: 0, right: 12, top: 8 }}>
+      <LineChart
+        responsive
+        data={chart.data}
+        margin={{ left: 0, right: 12, top: 8 }}
+      >
         <CartesianGrid stroke={chart.color("border")} vertical={false} />
         <XAxis
           axisLine={false}
