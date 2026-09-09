@@ -23,6 +23,9 @@ const schema = a.schema({
     .authorization((allow) => [allow.owner().identityClaim("sub")])
     .secondaryIndexes((index) => [
       index("owner").sortKeys(["date"]).queryField("listWorkoutSetsByDate"),
+      index("exerciseId")
+        .sortKeys(["date"])
+        .queryField("listWorkoutSetsByExerciseDate"),
     ]),
 
   BodyWeight: a

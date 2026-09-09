@@ -14,6 +14,7 @@
 | バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
 | UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
+| グラフ | `@chakra-ui/charts` + `recharts`（グラフ画面のみ。ルートを遅延読み込み） |
 | アイコン | react-icons（Lucide: `react-icons/lu`） |
 | トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
 | Lint/Format | Biome |
@@ -26,7 +27,7 @@
 - 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）
 - フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
 - 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
-- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/` と「種目」`/exercises`
+- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/`、「種目」`/exercises`、「グラフ」`/stats`
 
 ## データモデル（`amplify/data/resource.ts`）
 
@@ -34,7 +35,8 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 - **Exercise**（種目マスタ）: `name`, `category`, `owner`。ユーザーが登録した種目を保持し、記録画面の種目選択に使う。
 - **WorkoutSet**（トレーニング記録・1セット=1レコード）: `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`。セカンダリインデックス `owner + date`（`listWorkoutSetsByDate`）でカレンダー・日別表示に対応。
-  - `exerciseId + date` のセカンダリインデックス（種目別グラフ用）は未追加。Issue #6 実装時に追加予定。
+  - セカンダリインデックス `exerciseId + date`（`listWorkoutSetsByExerciseDate`）で種目別グラフのクエリに対応。
+    - **⚠ サンドボックス/本番のスキーマ再デプロイ（`ampx sandbox` など）が必要。** 反映前はグラフ画面の種目別セクションでクエリエラーになる。
 - **BodyWeight**（体重記録）: `date`, `weight`, `owner`。セカンダリインデックス `owner + date`（`listBodyWeightsByDate`）。
 
 ## 認証（`amplify/auth/resource.ts`）
@@ -60,6 +62,15 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
   - 表示中の月を含む6週間ぶんの `WorkoutSet` / `BodyWeight` を日付範囲でまとめて取得（`useWorkoutSetsInRange` / `useBodyWeightsInRange`）
 - 週の記録サマリー: 常に「今週」（本日を含む日〜土、カレンダーの表示月とは独立）の「トレーニング日数」「合計セット数」「総挙上量（Σ 重量×回数）」「体重（その週の最新記録）」。体重の値は `/body-weight?date=<本日>` へのリンク
 - 画面下部に固定表示の「本日のトレーニングを記録」ボタン → `/record?date=<本日>`
+
+### グラフ画面 `/stats`
+- 画面上部に期間粒度の切替（週＝直近12週 / 月＝直近12ヶ月 / 年＝直近5年）。`SegmentGroup` で選択、既定は「月」
+- 期間粒度ごとにデータをバケットに集計し、折れ線グラフ（`StatsLineChart` = `@chakra-ui/charts`）で推移を表示
+- **体重の推移**: バケットごとの体重の平均値を折れ線表示。カード右上に期間全体の平均値
+- **種目別の記録推移**: 種目セレクト＋指標切替（最大重量 / 総挙上量）。選択種目のセット記録をバケット集計して折れ線表示。カード右上に期間全体の平均値
+  - 種目別クエリは `WorkoutSet` の `listWorkoutSetsByExerciseDate`（`exerciseId + date` GSI）を使用
+- 記録のないバケットは点を打たず線でつなぐ。データ0件・種目未登録時は各カードにメッセージ表示
+- ルート（recharts 込み）は `React.lazy` で遅延読み込み
 
 ### 種目管理画面 `/exercises`
 - 種目名・カテゴリ（胸/背中/肩/腕/脚/有酸素/その他）を指定して種目を追加
@@ -99,7 +110,8 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 グローバルメニュー（全認証済み画面の下部に常時表示）
  ├─ ホーム ──> /
- └─ 種目 ───> /exercises
+ ├─ 種目 ───> /exercises
+ └─ グラフ ─> /stats
 
 / (ホーム / カレンダー)
  ├─ カレンダーの日付タップ ────────> /record?date=<日付>
@@ -123,5 +135,4 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
   - コンポーネントはファイル・ディレクトリ名をアッパーキャメルにし、`Xxx/Xxx.tsx` + `Xxx.module.css` の単位で配置する（`pages` 配下も同様）
   - `src/components` は UI コンポーネント専用。ルーティングは `src/routes`、Provider は `src/providers` に定義する
   - hooks のファイル名は `useXxx.ts` 形式にする
-- Issue #6 着手時に `WorkoutSet` へ `exerciseId + date` のセカンダリインデックスを追加する（当初 #8 で予定していたが #6 に変更済み）
 - 実データ（Cognito + AppSync）を用いた動作確認はサンドボックス環境では実施できないため、各PRのテスト計画に実機確認項目を明記する

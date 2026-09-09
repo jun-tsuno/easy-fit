@@ -56,6 +56,76 @@ export function getWeekRange(dateString: string): {
   return { start: toDateString(start), end: toDateString(end) };
 }
 
+/** グラフの期間粒度 */
+export type StatsPeriod = "week" | "month" | "year";
+
+export type StatsBucket = {
+  /** バケットを一意に識別するキー */
+  key: string;
+  /** X軸に表示する短いラベル */
+  label: string;
+  /** バケットの開始日 "YYYY-MM-DD"（含む） */
+  start: string;
+  /** バケットの終了日 "YYYY-MM-DD"（含む） */
+  end: string;
+};
+
+/** 各粒度で表示するバケット数 */
+const BUCKET_COUNT: Record<StatsPeriod, number> = {
+  week: 12,
+  month: 12,
+  year: 5,
+};
+
+/**
+ * 指定日を基準に、粒度ごとの連続したバケット列を古い順で返す。
+ * - week: 直近 12 週（日曜〜土曜）
+ * - month: 直近 12 ヶ月
+ * - year: 直近 5 年
+ */
+export function getStatsBuckets(
+  period: StatsPeriod,
+  refDateString: string = getTodayDateString(),
+): StatsBucket[] {
+  const ref = parseDateString(refDateString);
+  const count = BUCKET_COUNT[period];
+  const buckets: StatsBucket[] = [];
+
+  for (let offset = count - 1; offset >= 0; offset -= 1) {
+    if (period === "week") {
+      const start = new Date(ref);
+      start.setDate(start.getDate() - start.getDay() - offset * 7);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      buckets.push({
+        key: toDateString(start),
+        label: `${start.getMonth() + 1}/${start.getDate()}`,
+        start: toDateString(start),
+        end: toDateString(end),
+      });
+    } else if (period === "month") {
+      const start = new Date(ref.getFullYear(), ref.getMonth() - offset, 1);
+      const end = new Date(ref.getFullYear(), ref.getMonth() - offset + 1, 0);
+      buckets.push({
+        key: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`,
+        label: `${start.getMonth() + 1}月`,
+        start: toDateString(start),
+        end: toDateString(end),
+      });
+    } else {
+      const year = ref.getFullYear() - offset;
+      buckets.push({
+        key: String(year),
+        label: `${year}`,
+        start: `${year}-01-01`,
+        end: `${year}-12-31`,
+      });
+    }
+  }
+
+  return buckets;
+}
+
 /** "2026年9月" 形式の月ラベル */
 export function formatMonthLabel(year: number, month: number): string {
   return `${year}年${month}月`;

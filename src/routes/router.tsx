@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 import { BodyWeightPage } from "@/pages/BodyWeight/BodyWeight";
 import { ExercisesPage } from "@/pages/Exercises/Exercises";
@@ -8,6 +9,13 @@ import { RecordExerciseSelectPage } from "@/pages/RecordExerciseSelect/RecordExe
 import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
 import { AppLayout } from "@/routes/AppLayout/AppLayout";
 import { ProtectedRoute } from "@/routes/ProtectedRoute/ProtectedRoute";
+
+// グラフ画面はチャートライブラリ(recharts)を含み重いため遅延読み込みする
+const StatsPage = lazy(() =>
+  import("@/pages/Stats/Stats").then((module) => ({
+    default: module.StatsPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +35,14 @@ export const router = createBrowserRouter([
           {
             path: "/exercises",
             element: <ExercisesPage />,
+          },
+          {
+            path: "/stats",
+            element: (
+              <Suspense fallback={null}>
+                <StatsPage />
+              </Suspense>
+            ),
           },
           {
             path: "/record",

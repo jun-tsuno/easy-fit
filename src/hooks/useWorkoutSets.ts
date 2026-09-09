@@ -36,6 +36,32 @@ export function useWorkoutSetsInRange(start: string, end: string) {
   });
 }
 
+async function fetchWorkoutSetsByExerciseInRange(
+  exerciseId: string,
+  start: string,
+  end: string,
+) {
+  const { data, errors } =
+    await client.models.WorkoutSet.listWorkoutSetsByExerciseDate(
+      { exerciseId, date: { between: [start, end] } },
+      { limit: 1000 },
+    );
+  if (errors) throw new Error(errors.map((error) => error.message).join(", "));
+  return data;
+}
+
+export function useWorkoutSetsByExerciseInRange(
+  exerciseId: string,
+  start: string,
+  end: string,
+) {
+  return useQuery({
+    queryKey: ["workoutSets", "exerciseRange", exerciseId, start, end],
+    queryFn: () => fetchWorkoutSetsByExerciseInRange(exerciseId, start, end),
+    enabled: exerciseId !== "",
+  });
+}
+
 async function fetchWorkoutSetsByExercise(date: string, exerciseId: string) {
   const { data, errors } = await client.models.WorkoutSet.list({
     filter: {
