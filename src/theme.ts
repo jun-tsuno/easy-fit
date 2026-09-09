@@ -38,9 +38,8 @@ const config = defineConfig({
       colors: {
         brand: {
           solid: { value: "{colors.brand.500}" },
-          // オレンジ面は白文字だとコントラスト不足のため濃色を載せる
-          contrast: { value: "#3a1a06" },
-          // 白背景で読める濃さ
+          contrast: { value: "white" },
+          // 白背景に載せるアクセント文字は読める濃さに
           fg: { value: "{colors.brand.700}" },
           muted: { value: "{colors.brand.100}" },
           subtle: { value: "{colors.brand.50}" },

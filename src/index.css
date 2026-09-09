@@ -14,8 +14,8 @@
   /* プライマリ / セカンダリ（どちらもアクセント。中立要素には使わない） */
   --color-accent: #ff7628;
   --color-secondary: #ffa66d;
-  /* アクセント面の上に載せる文字色 */
-  --color-on-accent: #3a1a06;
+  /* アクセント面（オレンジ）の上に載せる文字色 */
+  --color-on-accent: #ffffff;
   --radius-card: 0.75rem;
 }
 
