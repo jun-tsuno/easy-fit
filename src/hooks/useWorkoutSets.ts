@@ -36,6 +36,32 @@ export function useWorkoutSetsInRange(start: string, end: string) {
   });
 }
 
+async function fetchWorkoutSetsByExerciseInRange(
+  exerciseId: string,
+  start: string,
+  end: string,
+) {
+  const { data, errors } =
+    await client.models.WorkoutSet.listWorkoutSetsByExerciseDate(
+      { exerciseId, date: { between: [start, end] } },
+      { limit: 1000 },
+    );
+  if (errors) throw new Error(errors.map((error) => error.message).join(", "));
+  return data;
+}
+
+export function useWorkoutSetsByExerciseInRange(
+  exerciseId: string,
+  start: string,
+  end: string,
+) {
+  return useQuery({
+    queryKey: ["workoutSets", "exerciseRange", exerciseId, start, end],
+    queryFn: () => fetchWorkoutSetsByExerciseInRange(exerciseId, start, end),
+    enabled: exerciseId !== "",
+  });
+}
+
 async function fetchWorkoutSetsByExercise(date: string, exerciseId: string) {
   const { data, errors } = await client.models.WorkoutSet.list({
     filter: {
@@ -53,76 +79,63 @@ export function useWorkoutSetsByExercise(date: string, exerciseId: string) {
   });
 }
 
-type CreateWorkoutSetInput = {
-  date: string;
-  exerciseId: string;
+/** 1セット分の保存内容。id があれば更新、なければ新規作成 */
+export type WorkoutSetDraft = {
+  id: string | null;
   weight: number;
   reps: number;
   setNumber: number;
 };
 
-export function useCreateWorkoutSet() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (input: CreateWorkoutSetInput) => {
-      const { data, errors } = await client.models.WorkoutSet.create(input);
-      if (errors) {
-        throw new Error(errors.map((error) => error.message).join(", "));
-      }
-      return data;
-    },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workoutSets", variables.date],
-      });
-    },
-  });
-}
-
-type UpdateWorkoutSetInput = {
-  id: string;
-  date: string;
-  weight: number;
-  reps: number;
+type SaveExerciseSetsInput = {
+  /** 保存対象のセット（配列順で setNumber を採番済み） */
+  sets: WorkoutSetDraft[];
+  /** 画面から削除された既存セットの id */
+  deletedIds: string[];
 };
 
-export function useUpdateWorkoutSet() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, weight, reps }: UpdateWorkoutSetInput) => {
-      const { data, errors } = await client.models.WorkoutSet.update({
-        id,
-        weight,
-        reps,
-      });
-      if (errors) {
-        throw new Error(errors.map((error) => error.message).join(", "));
-      }
-      return data;
-    },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workoutSets", variables.date],
-      });
-    },
-  });
+function throwOnErrors(errors: readonly { message: string }[] | undefined) {
+  if (errors?.length) {
+    throw new Error(errors.map((error) => error.message).join(", "));
+  }
 }
 
-export function useDeleteWorkoutSet(date: string) {
+/**
+ * 指定日・種目のセット記録を「保存」ボタン押下時にまとめて反映する。
+ * 削除 → 更新/新規作成 の順に適用する。
+ */
+export function useSaveExerciseSets(date: string, exerciseId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { data, errors } = await client.models.WorkoutSet.delete({ id });
-      if (errors) {
-        throw new Error(errors.map((error) => error.message).join(", "));
+    mutationFn: async ({ sets, deletedIds }: SaveExerciseSetsInput) => {
+      for (const id of deletedIds) {
+        const { errors } = await client.models.WorkoutSet.delete({ id });
+        throwOnErrors(errors);
       }
-      return data;
+      for (const set of sets) {
+        if (set.id) {
+          const { errors } = await client.models.WorkoutSet.update({
+            id: set.id,
+            weight: set.weight,
+            reps: set.reps,
+            setNumber: set.setNumber,
+          });
+          throwOnErrors(errors);
+        } else {
+          const { errors } = await client.models.WorkoutSet.create({
+            date,
+            exerciseId,
+            weight: set.weight,
+            reps: set.reps,
+            setNumber: set.setNumber,
+          });
+          throwOnErrors(errors);
+        }
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workoutSets", date] });
+      queryClient.invalidateQueries({ queryKey: ["workoutSets"] });
     },
   });
 }

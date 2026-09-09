@@ -1,6 +1,6 @@
 # easy-fit プロジェクト概要
 
-個人用の筋トレ管理アプリ。日々のトレーニング内容（種目・重量・Rep数・Set数）と体重を記録し、後日カレンダーやグラフで振り返ることを目的とする。AWS Amplify Gen2 をバックエンドに、React (Vite) で構築している。
+個人用の筋トレ管理アプリ。日々のトレーニング内容（種目・重量・Rep数・Set数）と体重を記録し、後日カレンダーや履歴グラフで振り返ることを目的とする。AWS Amplify Gen2 をバックエンドに、React (Vite) で構築している。
 
 このドキュメントはセッション間で開発状況を共有するためのもの。実装済みの画面構成・データモデルをまとめる。更新のたびに実態に合わせて書き直すこと。
 
@@ -14,6 +14,7 @@
 | バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
 | 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
 | UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
+| グラフ描画 | `@chakra-ui/charts` + `recharts`（履歴画面のみ。ルートを遅延読み込み） |
 | アイコン | react-icons（Lucide: `react-icons/lu`） |
 | トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
 | Lint/Format | Biome |
@@ -21,12 +22,19 @@
 ### デザイン方針
 
 - ライトモードのみ（ダークモード・テーマ切替は廃止）
-- ベース背景 `#F2F2F2` / カード背面 `#FFF` + うっすらとした shadow（`--shadow-card`）
-- アクセントカラー `#CE0000`（Chakra の `brand` パレット = レッド）
-- 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）
+- 背景は全画面 `#FFF`。カード（白背面 + shadow）は使わず、要素はフラットに配置する
+- セクション・リスト項目の区切りは余白（大きめ）と 1px の divider（`--color-divider`）で表現する
+- プライマリカラー `#FF7628`（オレンジ。`--color-accent` / Chakra `brand` パレットの 500）。プライマリボタン・当日セル・記録アイコン・種目グラフ・アクティブタブに限定
+- セカンダリカラー `#FFA66D`（淡いオレンジ。`--color-secondary` / `brand` パレットの 300）。体重グラフの折れ線などに使用
+- プライマリ / セカンダリは**どちらもアクセント色**。キャンセルなど中立的なボタンには使わず `colorPalette="gray"` にする
+- オレンジ面の上の文字は白（`--color-on-accent` / Chakra `brand.contrast`）。白背景に載せるアクセント文字は `brand.fg` = `brand.700`（読める濃さ）
+- 破壊的操作（削除・ゴミ箱アイコン）は `--color-destructive` `#CE0000`（赤）。該当の `Button` / `IconButton` には `colorPalette="red"` を付ける
+- 画面の戻るボタンは枠なし（Chakra `IconButton` の `ghost` バリアント）。トップレベルのタブ画面（ホーム / 履歴 / 種目）には戻るボタンを置かない
 - フォントウェイトの基本は 500（`body { font-weight: 500 }`、見出しは 600）
-- 色・shadow・角丸は `src/index.css` の CSS 変数（`--color-*` / `--shadow-card` / `--radius-card`）に集約
-- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは「ホーム」`/` と「種目」`/exercises`
+- 画面左右の余白は 16px（`PageContainer` / 固定バーの `padding-inline: 16px`）
+- ルートフォントサイズは 17px（`:root { font-size: 106.25% }`）。本文の基準は `0.9375rem`、補足テキストは `0.8125rem`
+- 色・角丸は `src/index.css` の CSS 変数（`--color-*` / `--radius-card`）に集約。グレー文字は `--color-fg-muted`（`#545454`、コントラスト確保のため濃いめ）
+- 認証済み画面は `AppLayout`（`src/routes/AppLayout/`）で画面下部にグローバルメニュー `BottomNav`（`src/components/BottomNav/`）を常時表示。タブは左から「ホーム」`/`、「履歴」`/history`、「種目」`/exercises`
 
 ## データモデル（`amplify/data/resource.ts`）
 
@@ -34,7 +42,8 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 - **Exercise**（種目マスタ）: `name`, `category`, `owner`。ユーザーが登録した種目を保持し、記録画面の種目選択に使う。
 - **WorkoutSet**（トレーニング記録・1セット=1レコード）: `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`。セカンダリインデックス `owner + date`（`listWorkoutSetsByDate`）でカレンダー・日別表示に対応。
-  - `exerciseId + date` のセカンダリインデックス（種目別グラフ用）は未追加。Issue #6 実装時に追加予定。
+  - セカンダリインデックス `exerciseId + date`（`listWorkoutSetsByExerciseDate`）で履歴画面の種目別クエリに対応。
+    - **⚠ サンドボックス/本番のスキーマ再デプロイ（`ampx sandbox` など）が必要。** 反映前は履歴画面の種目別セクションでクエリエラーになる。
 - **BodyWeight**（体重記録）: `date`, `weight`, `owner`。セカンダリインデックス `owner + date`（`listBodyWeightsByDate`）。
 
 ## 認証（`amplify/auth/resource.ts`）
@@ -53,19 +62,29 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - ヘッダー: アプリタイトル、ログアウトボタン（種目への導線は下部のグローバルメニューに移動）
 - カレンダーをメインコンテンツとして配置（`src/components/Calendar/Calendar.tsx`、日曜始まり・6週間固定表示）
   - 月送り（前月/次月）と「今月」ボタン（当月以外を表示中のみ）で移動
-  - トレーニング記録がある日にはアクセントカラーの丸い点（ドット）を表示
-  - 体重記録がある日にはセル下部に体重値（`62.5kg` 形式）を表示
+  - トレーニング記録がある日はダンベルアイコン、体重記録がある日は体重計アイコンをセル下部に表示（数値は出さない）
   - 本日のセルを強調表示
   - 日付タップでその日のトレーニング記録画面 `/record?date=<日付>` に遷移
   - 表示中の月を含む6週間ぶんの `WorkoutSet` / `BodyWeight` を日付範囲でまとめて取得（`useWorkoutSetsInRange` / `useBodyWeightsInRange`）
-- 週の記録サマリー: 常に「今週」（本日を含む日〜土、カレンダーの表示月とは独立）の「トレーニング日数」「合計セット数」「総挙上量（Σ 重量×回数）」「体重（その週の最新記録）」。体重の値は `/body-weight?date=<本日>` へのリンク
+- 週の記録サマリー: 常に「今週」（本日を含む日〜土、カレンダーの表示月とは独立）の「トレーニング日数」「合計セット数」「総挙上量（Σ 重量×回数）」「体重（その週の最新記録）」。体重の値は `/body-weight?date=<本日>` へのリンク（色はアクセントではなく通常色）
 - 画面下部に固定表示の「本日のトレーニングを記録」ボタン → `/record?date=<本日>`
+
+### 履歴画面 `/history`（`src/pages/History/`）
+- 画面上部で振り返る期間を切替（週＝直近7日・日単位 / 月＝直近30日・日単位 / 年＝直近12ヶ月・月単位）。`SegmentGroup` で選択、既定は「週」
+- 期間内をバケット（日 or 月）に区切って集計し、折れ線グラフ（`StatsLineChart` = `@chakra-ui/charts`）で推移を表示。カード背面なしのフラット表示で、2セクションの間は広めに空ける
+- **種目別の記録推移**（上）: 種目セレクト＋指標切替（最大重量 / 総挙上量）。選択種目のセット記録をバケット集計して折れ線表示（プライマリ色）。見出し右に期間全体の平均値
+  - 種目別クエリは `WorkoutSet` の `listWorkoutSetsByExerciseDate`（`exerciseId + date` GSI）を使用
+- **体重の推移**（下）: バケットごとの体重の平均値を折れ線表示（セカンダリ色）。見出し右に期間全体の平均値
+- バケット生成は `getStatsBuckets`（`src/utils/date.ts`）、集計は `src/utils/stats.ts`
+- 記録のないバケットは点を打たず線でつなぐ。データ0件・種目未登録時はメッセージ表示
+- ルート（recharts 込み）は `React.lazy` で遅延読み込み
 
 ### 種目管理画面 `/exercises`
 - 種目名・カテゴリ（胸/背中/肩/腕/脚/有酸素/その他）を指定して種目を追加
 - 登録済み種目をカテゴリごとにセクション分けして一覧表示（カテゴリカラーのドットで区別）
 - 種目ごとに削除可能（確認ダイアログ表示）
-- クエリパラメータ `?category=` で追加フォームのカテゴリを事前選択、`?from=` で戻り先を指定可能（記録画面からの「種目を追加」導線で使用）
+- トップレベルのタブ画面のため戻るボタンは持たない（移動はグローバルメニュー）
+- クエリパラメータ `?category=` で追加フォームのカテゴリを事前選択。`?from=` がある場合（記録画面の「種目を追加」導線）は種目追加成功後にその URL へ自動で戻る
 
 ### トレーニング記録一覧画面 `/record?date=YYYY-MM-DD`
 - ページタイトルに対象日を表示（`9月8日(月)のトレーニング` 形式）。日付はカレンダーからの遷移で決まるため、画面内に日付ピッカーは持たない（デフォルトは当日）
@@ -82,9 +101,10 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 ### セット入力画面 `/record/new/:exerciseId?date=YYYY-MM-DD`
 - 選択した種目・日付における記録を1セット=1行で表示（初期状態は1セット分の入力欄）
-- 重量・回数は横並び、下線のみ（枠なし）の入力欄。入力後フォーカスを外すと自動保存され、トーストで完了を通知
-- 「セットを追加」ボタンで2セット目以降を追加
-- セットごとに削除ボタンあり
+- 重量・回数は横並び、下線のみ（枠なし）の入力欄。行の編集では保存せず、下部の「保存」ボタン押下時に一括で反映（`useSaveExerciseSets`）
+  - 未入力（重量・回数とも空）の行は無視。画面から消した既存セットは保存時に削除。setNumber は表示順で採番し直す
+  - 保存成功でトースト通知し、記録一覧画面 `/record?date=...` へ戻る
+- 「セットを追加」ボタンで2セット目以降を追加。セットごとに削除ボタンあり
 - 戻るボタンで種目選択画面へ
 
 ### 体重記録画面 `/body-weight?date=YYYY-MM-DD`
@@ -97,8 +117,9 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ```
 /login ──(ログイン成功)──> /
 
-グローバルメニュー（全認証済み画面の下部に常時表示）
+グローバルメニュー（全認証済み画面の下部に常時表示。左から）
  ├─ ホーム ──> /
+ ├─ 履歴 ───> /history
  └─ 種目 ───> /exercises
 
 / (ホーム / カレンダー)
@@ -123,5 +144,4 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
   - コンポーネントはファイル・ディレクトリ名をアッパーキャメルにし、`Xxx/Xxx.tsx` + `Xxx.module.css` の単位で配置する（`pages` 配下も同様）
   - `src/components` は UI コンポーネント専用。ルーティングは `src/routes`、Provider は `src/providers` に定義する
   - hooks のファイル名は `useXxx.ts` 形式にする
-- Issue #6 着手時に `WorkoutSet` へ `exerciseId + date` のセカンダリインデックスを追加する（当初 #8 で予定していたが #6 に変更済み）
 - 実データ（Cognito + AppSync）を用いた動作確認はサンドボックス環境では実施できないため、各PRのテスト計画に実機確認項目を明記する

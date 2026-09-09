@@ -43,7 +43,7 @@ export function HomePage() {
     };
   }, [visibleMonth]);
 
-  // カレンダーのドット・体重表示は「表示中の月」を含む6週間ぶんを取得
+  // カレンダーの記録アイコンは「表示中の月」を含む6週間ぶんを取得
   const { data: workoutSets } = useWorkoutSetsInRange(rangeStart, rangeEnd);
   const { data: bodyWeights } = useBodyWeightsInRange(rangeStart, rangeEnd);
 
@@ -52,13 +52,10 @@ export function HomePage() {
     [workoutSets],
   );
 
-  const calendarAnnotations = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const record of bodyWeights ?? []) {
-      map.set(record.date, `${record.weight}kg`);
-    }
-    return map;
-  }, [bodyWeights]);
+  const weightDates = useMemo(
+    () => new Set((bodyWeights ?? []).map((record) => record.date)),
+    [bodyWeights],
+  );
 
   // 週サマリーは常に「今週」(本日を含む日〜土)を対象に別途取得する
   const currentWeek = useMemo(() => getWeekRange(today), [today]);
@@ -100,19 +97,17 @@ export function HomePage() {
       </header>
 
       <main className={styles.main}>
-        <div className={styles.card}>
-          <Calendar
-            year={visibleMonth.year}
-            month={visibleMonth.month}
-            selectedDate={today}
-            onSelectDate={(date) => navigate(`/record?date=${date}`)}
-            onMonthChange={(year, month) => setVisibleMonth({ year, month })}
-            markedDates={workoutDates}
-            annotations={calendarAnnotations}
-          />
-        </div>
+        <Calendar
+          year={visibleMonth.year}
+          month={visibleMonth.month}
+          selectedDate={today}
+          onSelectDate={(date) => navigate(`/record?date=${date}`)}
+          onMonthChange={(year, month) => setVisibleMonth({ year, month })}
+          workoutDates={workoutDates}
+          weightDates={weightDates}
+        />
 
-        <section className={`${styles.card} ${styles.summary}`}>
+        <section className={styles.summary}>
           <h2 className={styles.summaryTitle}>
             今週の記録
             <span className={styles.summaryRange}>

@@ -1,15 +1,21 @@
 @import "@fontsource-variable/geist";
 
 :root {
-  --color-bg: #f2f2f2;
+  /* 基準フォントサイズ 17px（rem の基準）。全体を少し大きめに */
+  font-size: 106.25%;
+  --color-bg: #ffffff;
   --color-card: #ffffff;
   --color-fg: #1a1a1a;
-  --color-fg-muted: #6f6f6f;
-  --color-border: #e4e4e4;
-  --color-bg-muted: #ececec;
+  --color-fg-muted: #545454;
+  --color-border: #e2e2e2;
+  --color-divider: #ececec;
+  --color-bg-muted: #f2f2f2;
   --color-destructive: #ce0000;
-  --color-accent: #ce0000;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 3px rgb(0 0 0 / 8%);
+  /* プライマリ / セカンダリ（どちらもアクセント。中立要素には使わない） */
+  --color-accent: #ff7628;
+  --color-secondary: #ffa66d;
+  /* アクセント面（オレンジ）の上に載せる文字色 */
+  --color-on-accent: #ffffff;
   --radius-card: 0.75rem;
 }
 

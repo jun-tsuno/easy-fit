@@ -7,7 +7,7 @@
 
 .title {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.1875rem;
   font-weight: 600;
 }
 
@@ -21,7 +21,7 @@
 .error {
   padding-block: 1.5rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--color-destructive);
 }
 
@@ -40,7 +40,7 @@
 .setNumber {
   width: 1.25rem;
   flex-shrink: 0;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--color-fg-muted);
 }
 
@@ -53,7 +53,7 @@
 
 .unit {
   flex-shrink: 0;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--color-fg-muted);
 }
 
@@ -62,6 +62,13 @@
   color: var(--color-fg-muted);
 }
 
-.addButton {
-  margin-top: 0.5rem;
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.actions button {
+  width: 100%;
 }

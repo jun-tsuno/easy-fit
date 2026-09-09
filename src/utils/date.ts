@@ -56,6 +56,62 @@ export function getWeekRange(dateString: string): {
   return { start: toDateString(start), end: toDateString(end) };
 }
 
+/** グラフで振り返る期間。直近 1 週間 / 1 ヶ月 / 1 年 */
+export type StatsPeriod = "week" | "month" | "year";
+
+export type StatsBucket = {
+  /** バケットを一意に識別するキー */
+  key: string;
+  /** X軸に表示する短いラベル */
+  label: string;
+  /** バケットの開始日 "YYYY-MM-DD"（含む） */
+  start: string;
+  /** バケットの終了日 "YYYY-MM-DD"（含む） */
+  end: string;
+};
+
+/**
+ * 指定日を基準に、期間を区切ったバケット列を古い順で返す。
+ * - week: 直近 7 日（当日を含む）を日単位
+ * - month: 直近 30 日（当日を含む）を日単位
+ * - year: 直近 12 ヶ月（当月を含む）を月単位
+ */
+export function getStatsBuckets(
+  period: StatsPeriod,
+  refDateString: string = getTodayDateString(),
+): StatsBucket[] {
+  const ref = parseDateString(refDateString);
+  const buckets: StatsBucket[] = [];
+
+  if (period === "year") {
+    for (let offset = 11; offset >= 0; offset -= 1) {
+      const first = new Date(ref.getFullYear(), ref.getMonth() - offset, 1);
+      const last = new Date(ref.getFullYear(), ref.getMonth() - offset + 1, 0);
+      buckets.push({
+        key: `${first.getFullYear()}-${String(first.getMonth() + 1).padStart(2, "0")}`,
+        label: `${first.getMonth() + 1}月`,
+        start: toDateString(first),
+        end: toDateString(last),
+      });
+    }
+    return buckets;
+  }
+
+  const days = period === "week" ? 7 : 30;
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const day = new Date(ref);
+    day.setDate(day.getDate() - offset);
+    const key = toDateString(day);
+    buckets.push({
+      key,
+      label: `${day.getMonth() + 1}/${day.getDate()}`,
+      start: key,
+      end: key,
+    });
+  }
+  return buckets;
+}
+
 /** "2026年9月" 形式の月ラベル */
 export function formatMonthLabel(year: number, month: number): string {
   return `${year}年${month}月`;
