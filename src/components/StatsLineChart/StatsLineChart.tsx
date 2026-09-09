@@ -46,8 +46,9 @@ export function StatsLineChart({
           dataKey={chart.key("label")}
           stroke={chart.color("border")}
           tick={{ fontSize: 12, fill: chart.color("fg.muted") }}
-          interval="preserveStartEnd"
-          minTickGap={12}
+          interval="equidistantPreserveEnd"
+          minTickGap={8}
+          padding={{ left: 8, right: 8 }}
         />
         <YAxis
           axisLine={false}
