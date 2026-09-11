@@ -4,6 +4,7 @@ import { BodyWeightPage } from "@/pages/BodyWeight/BodyWeight";
 import { ExercisesPage } from "@/pages/Exercises/Exercises";
 import { HomePage } from "@/pages/Home/Home";
 import { LoginPage } from "@/pages/Login/Login";
+import { MyPagePage } from "@/pages/MyPage/MyPage";
 import { RecordListPage } from "@/pages/Record/Record";
 import { RecordExerciseSelectPage } from "@/pages/RecordExerciseSelect/RecordExerciseSelect";
 import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
           {
             path: "/body-weight",
             element: <BodyWeightPage />,
+          },
+          {
+            path: "/mypage",
+            element: <MyPagePage />,
           },
         ],
       },

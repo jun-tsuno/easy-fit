@@ -117,6 +117,16 @@ export function formatMonthLabel(year: number, month: number): string {
   return `${year}年${month}月`;
 }
 
+/** 指定月(month は 1-12)の初日・末日を "YYYY-MM-DD" で返す */
+export function getMonthRange(
+  year: number,
+  month: number,
+): { start: string; end: string } {
+  const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 0);
+  return { start: toDateString(start), end: toDateString(end) };
+}
+
 /** "9/7" のような短い日付表記 */
 export function formatShortDate(dateString: string): string {
   const date = parseDateString(dateString);
