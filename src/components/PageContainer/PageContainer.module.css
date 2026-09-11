@@ -1,11 +1,11 @@
 .container {
-  margin-inline: auto;
-  display: flex;
-  min-height: 100svh;
-  width: 100%;
-  max-width: 28rem;
-  flex-direction: column;
-  padding-inline: 16px;
-  padding-top: 2rem;
-  padding-bottom: 5.5rem;
+	margin-inline: auto;
+	display: flex;
+	min-height: 100svh;
+	width: 100%;
+	max-width: 28rem;
+	flex-direction: column;
+	padding-inline: 16px;
+	padding-top: 1rem;
+	padding-bottom: 5.5rem;
 }

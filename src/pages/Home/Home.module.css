@@ -1,116 +1,121 @@
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 1rem;
+}
+
+.logo {
+	height: 3rem;
+	width: auto;
 }
 
 .main {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2rem;
-  /* 固定表示の記録ボタン + グローバルメニューぶんの余白 */
-  padding-bottom: 4.5rem;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 2rem;
+	/* 固定表示の記録ボタン + グローバルメニューぶんの余白 */
+	padding-bottom: 4.5rem;
 }
 
 .summary {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  border-top: 1px solid var(--color-divider);
-  padding-top: 1.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	border-top: 1px solid var(--color-divider);
+	padding-top: 1.75rem;
 }
 
 .summaryTitle {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 600;
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5rem;
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
 }
 
 .summaryRange {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-fg-muted);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--color-fg-muted);
 }
 
 .summaryGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem 0.75rem;
-  margin: 0;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem 0.75rem;
+	margin: 0;
 }
 
 .summaryItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
 }
 
 .summaryLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.8125rem;
-  color: var(--color-fg-muted);
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-size: 0.8125rem;
+	color: var(--color-fg-muted);
 }
 
 .summaryIcon {
-  width: 0.875rem;
-  height: 0.875rem;
+	width: 0.875rem;
+	height: 0.875rem;
 }
 
 .summaryValue {
-  display: flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+	display: flex;
+	align-items: baseline;
+	gap: 0.25rem;
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 600;
 }
 
 .summaryUnit {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-fg-muted);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--color-fg-muted);
 }
 
 .weightLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.125rem;
-  color: var(--color-fg);
-  text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.125rem;
+	color: var(--color-fg);
+	text-decoration: none;
 }
 
 .weightLink .summaryUnit {
-  align-self: baseline;
-  color: inherit;
+	align-self: baseline;
+	color: inherit;
 }
 
 .weightChevron {
-  width: 1rem;
-  height: 1rem;
-  color: var(--color-fg-muted);
+	width: 1rem;
+	height: 1rem;
+	color: var(--color-fg-muted);
 }
 
 .loadingRow {
-  display: flex;
-  justify-content: center;
-  padding-block: 1.5rem;
+	display: flex;
+	justify-content: center;
+	padding-block: 1.5rem;
 }
 
 .recordBar {
-  position: fixed;
-  left: 50%;
-  bottom: 4.75rem;
-  z-index: 15;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 28rem;
-  padding-inline: 16px;
+	position: fixed;
+	left: 50%;
+	bottom: 4.75rem;
+	z-index: 15;
+	transform: translateX(-50%);
+	width: 100%;
+	max-width: 28rem;
+	padding-inline: 16px;
 }

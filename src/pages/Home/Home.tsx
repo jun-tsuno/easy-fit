@@ -14,7 +14,6 @@ import { Calendar } from "@/components/Calendar/Calendar";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useBodyWeightsInRange } from "@/hooks/useBodyWeight";
 import { useWorkoutSetsInRange } from "@/hooks/useWorkoutSets";
-import titleStyles from "@/styles/brandTitle.module.css";
 import {
   formatShortDate,
   getCalendarDays,
@@ -84,7 +83,7 @@ export function HomePage() {
   return (
     <PageContainer>
       <header className={styles.header}>
-        <h1 className={titleStyles.title}>easy-fit</h1>
+        <img src="/logo.svg" alt="easy-fit" className={styles.logo} />
         <IconButton variant="ghost" aria-label="マイページ" asChild>
           <Link to="/mypage">
             <LuUser />
