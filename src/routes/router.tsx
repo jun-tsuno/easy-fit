@@ -10,6 +10,7 @@ import { RecordExerciseSelectPage } from "@/pages/RecordExerciseSelect/RecordExe
 import { RecordSetInputPage } from "@/pages/RecordSetInput/RecordSetInput";
 import { AppLayout } from "@/routes/AppLayout/AppLayout";
 import { ProtectedRoute } from "@/routes/ProtectedRoute/ProtectedRoute";
+import { RouteErrorBoundary } from "@/routes/RouteErrorBoundary/RouteErrorBoundary";
 
 // 履歴画面はチャートライブラリ(recharts)を含み重いため遅延読み込みする
 const HistoryPage = lazy(() =>
@@ -20,50 +21,55 @@ const HistoryPage = lazy(() =>
 
 export const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    element: <ProtectedRoute />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
-        element: <AppLayout />,
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        element: <ProtectedRoute />,
         children: [
           {
-            path: "/",
-            element: <HomePage />,
-          },
-          {
-            path: "/exercises",
-            element: <ExercisesPage />,
-          },
-          {
-            path: "/history",
-            element: (
-              <Suspense fallback={null}>
-                <HistoryPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "/record",
-            element: <RecordListPage />,
-          },
-          {
-            path: "/record/new",
-            element: <RecordExerciseSelectPage />,
-          },
-          {
-            path: "/record/new/:exerciseId",
-            element: <RecordSetInputPage />,
-          },
-          {
-            path: "/body-weight",
-            element: <BodyWeightPage />,
-          },
-          {
-            path: "/mypage",
-            element: <MyPagePage />,
+            element: <AppLayout />,
+            children: [
+              {
+                path: "/",
+                element: <HomePage />,
+              },
+              {
+                path: "/exercises",
+                element: <ExercisesPage />,
+              },
+              {
+                path: "/history",
+                element: (
+                  <Suspense fallback={null}>
+                    <HistoryPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/record",
+                element: <RecordListPage />,
+              },
+              {
+                path: "/record/new",
+                element: <RecordExerciseSelectPage />,
+              },
+              {
+                path: "/record/new/:exerciseId",
+                element: <RecordSetInputPage />,
+              },
+              {
+                path: "/body-weight",
+                element: <BodyWeightPage />,
+              },
+              {
+                path: "/mypage",
+                element: <MyPagePage />,
+              },
+            ],
           },
         ],
       },
