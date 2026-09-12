@@ -163,9 +163,6 @@ export function ExercisesPage() {
           />
         </div>
         <div className={styles.field}>
-          <label htmlFor="exercise-category" className={styles.label}>
-            カテゴリ
-          </label>
           <Select.Root
             collection={categoryCollection}
             value={category ? [category] : []}
@@ -174,8 +171,9 @@ export function ExercisesPage() {
             }
             positioning={{ placement: "bottom-start", flip: false }}
           >
+            <Select.Label className={styles.label}>カテゴリ</Select.Label>
             <Select.Control>
-              <Select.Trigger id="exercise-category">
+              <Select.Trigger>
                 <Select.ValueText placeholder="カテゴリを選択" />
               </Select.Trigger>
               <Select.IndicatorGroup>
