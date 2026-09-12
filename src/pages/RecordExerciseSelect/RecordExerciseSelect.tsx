@@ -46,14 +46,7 @@ export function RecordExerciseSelectPage() {
                   <CategoryDot color={cat.color} />
                   {cat.label}
                 </h2>
-                {items.length === 0 ? (
-                  <Button variant="outline" justifyContent="flex-start" asChild>
-                    <Link to={addHref}>
-                      <LuPlus />
-                      種目を追加
-                    </Link>
-                  </Button>
-                ) : (
+                {items.length > 0 && (
                   <ul className={styles.items}>
                     {items.map((exercise) => (
                       <li key={exercise.id}>
@@ -70,6 +63,12 @@ export function RecordExerciseSelectPage() {
                     ))}
                   </ul>
                 )}
+                <Button variant="outline" justifyContent="flex-start" asChild>
+                  <Link to={addHref}>
+                    <LuPlus />
+                    種目を追加
+                  </Link>
+                </Button>
               </section>
             );
           })}

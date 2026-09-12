@@ -76,6 +76,14 @@
   text-decoration: none;
 }
 
+.itemStatic {
+  display: block;
+  padding: 0.75rem 0.25rem;
+  border-bottom: 1px solid var(--color-divider);
+  color: inherit;
+  opacity: 0.6;
+}
+
 .itemName {
   margin: 0;
   font-weight: 500;

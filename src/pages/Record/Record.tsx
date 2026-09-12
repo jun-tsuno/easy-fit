@@ -15,18 +15,50 @@ export function RecordListPage() {
   const { data: exercises } = useExercises();
   const { data: workoutSets, isPending, isError } = useWorkoutSetsByDate(date);
 
+  const knownExerciseIds = new Set(
+    (exercises ?? []).map((exercise) => exercise.id),
+  );
+
   const grouped = EXERCISE_CATEGORIES.map((cat) => {
     const items = (exercises ?? [])
       .filter((exercise) => exercise.category === cat.value)
       .map((exercise) => ({
-        exercise,
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
         sets: (workoutSets ?? [])
           .filter((set) => set.exerciseId === exercise.id)
           .sort((a, b) => a.setNumber - b.setNumber),
       }))
       .filter((item) => item.sets.length > 0);
-    return { category: cat, items };
+    return { category: cat, isUnassigned: false, items };
   }).filter((group) => group.items.length > 0);
+
+  const orphanedExerciseIds = Array.from(
+    new Set(
+      (workoutSets ?? [])
+        .filter((set) => !knownExerciseIds.has(set.exerciseId))
+        .map((set) => set.exerciseId),
+    ),
+  );
+
+  const unassignedGroup = {
+    category: {
+      value: "unassigned",
+      label: "未設定",
+      color: "oklch(0.55 0 0)",
+    },
+    isUnassigned: true,
+    items: orphanedExerciseIds.map((exerciseId) => ({
+      exerciseId,
+      exerciseName: "未設定の種目",
+      sets: (workoutSets ?? [])
+        .filter((set) => set.exerciseId === exerciseId)
+        .sort((a, b) => a.setNumber - b.setNumber),
+    })),
+  };
+
+  const allGroups =
+    unassignedGroup.items.length > 0 ? [...grouped, unassignedGroup] : grouped;
 
   return (
     <PageContainer>
@@ -56,33 +88,46 @@ export function RecordListPage() {
           </div>
         )}
         {isError && <p className={styles.error}>記録の取得に失敗しました。</p>}
-        {!isPending && !isError && grouped.length === 0 && (
+        {!isPending && !isError && allGroups.length === 0 && (
           <p className={styles.emptyText}>
             この日のトレーニング記録はまだありません。
           </p>
         )}
-        {grouped.map((group) => (
+        {allGroups.map((group) => (
           <section key={group.category.value} className={styles.section}>
             <h2 className={styles.sectionTitle}>
               <CategoryDot color={group.category.color} />
               {group.category.label}
             </h2>
             <ul className={styles.items}>
-              {group.items.map(({ exercise, sets }) => (
-                <li key={exercise.id}>
-                  <Link
-                    to={`/record/new/${exercise.id}?date=${date}`}
-                    className={styles.itemLink}
-                  >
-                    <p className={styles.itemName}>{exercise.name}</p>
-                    <p className={styles.itemSets}>
-                      {sets
-                        .map((set) => `${set.weight}kg×${set.reps}回`)
-                        .join(" / ")}
-                    </p>
-                  </Link>
-                </li>
-              ))}
+              {group.items.map(({ exerciseId, exerciseName, sets }) =>
+                group.isUnassigned ? (
+                  <li key={exerciseId}>
+                    <div className={styles.itemStatic}>
+                      <p className={styles.itemName}>{exerciseName}</p>
+                      <p className={styles.itemSets}>
+                        {sets
+                          .map((set) => `${set.weight}kg×${set.reps}回`)
+                          .join(" / ")}
+                      </p>
+                    </div>
+                  </li>
+                ) : (
+                  <li key={exerciseId}>
+                    <Link
+                      to={`/record/new/${exerciseId}?date=${date}`}
+                      className={styles.itemLink}
+                    >
+                      <p className={styles.itemName}>{exerciseName}</p>
+                      <p className={styles.itemSets}>
+                        {sets
+                          .map((set) => `${set.weight}kg×${set.reps}回`)
+                          .join(" / ")}
+                      </p>
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         ))}
