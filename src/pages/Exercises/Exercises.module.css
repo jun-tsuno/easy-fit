@@ -44,6 +44,12 @@
   color: var(--color-destructive);
 }
 
+.warning {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-fg-muted);
+}
+
 .list {
   margin-top: 0.5rem;
   display: flex;

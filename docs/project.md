@@ -6,18 +6,18 @@
 
 ## 技術スタック
 
-| 領域 | 技術 |
-| --- | --- |
-| フロントエンド | React 19 + Vite, TypeScript (strict) |
-| ルーティング | React Router v8 (`createBrowserRouter`) |
-| サーバー状態管理 | TanStack React Query v5 |
-| バックエンド | AWS Amplify Gen2 (`defineData`, `defineAuth`) |
-| 認証 | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録） |
-| UI | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
-| グラフ描画 | `@chakra-ui/charts` + `recharts`（履歴画面のみ。ルートを遅延読み込み） |
-| アイコン | react-icons（Lucide: `react-icons/lu`） |
-| トースト通知 | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`） |
-| Lint/Format | Biome |
+| 領域             | 技術                                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| フロントエンド   | React 19 + Vite, TypeScript (strict)                                                                                            |
+| ルーティング     | React Router v8 (`createBrowserRouter`)                                                                                         |
+| サーバー状態管理 | TanStack React Query v5                                                                                                         |
+| バックエンド     | AWS Amplify Gen2 (`defineData`, `defineAuth`)                                                                                   |
+| 認証             | Amazon Cognito（メール+パスワード、サインアップ導線なし、手動ユーザー登録）                                                     |
+| UI               | Chakra UI v3 + CSS Modules（レイアウト・独自スタイルは CSS Modules、コンポーネントのバリアント等は Chakra のテーマ/レシピ API） |
+| グラフ描画       | `@chakra-ui/charts` + `recharts`（履歴画面のみ。ルートを遅延読み込み）                                                          |
+| アイコン         | react-icons（Lucide: `react-icons/lu`）                                                                                         |
+| トースト通知     | Chakra UI の `Toaster`（`src/components/Toaster/Toaster.tsx`）                                                                  |
+| Lint/Format      | Biome                                                                                                                           |
 
 ### デザイン方針
 
@@ -55,10 +55,12 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ## 画面構成（実装済み）
 
 ### ログイン画面 `/login`
+
 - メールアドレス・パスワードでログイン
 - 認証済みの場合は `/` にリダイレクト
 
 ### ホーム画面 `/`
+
 - ヘッダー: アプリタイトル、ログアウトボタン（種目への導線は下部のグローバルメニューに移動）
 - カレンダーをメインコンテンツとして配置（`src/components/Calendar/Calendar.tsx`、日曜始まり・6週間固定表示）
   - 月送り（前月/次月）と「今月」ボタン（当月以外を表示中のみ）で移動
@@ -70,6 +72,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 画面下部に固定表示の「本日のトレーニングを記録」ボタン → `/record?date=<本日>`
 
 ### 履歴画面 `/history`（`src/pages/History/`）
+
 - 画面上部で振り返る期間を切替（週＝直近7日・日単位 / 月＝直近30日・日単位 / 年＝直近12ヶ月・月単位）。`SegmentGroup` で選択、既定は「週」
 - 期間内をバケット（日 or 月）に区切って集計し、折れ線グラフ（`StatsLineChart` = `@chakra-ui/charts`）で推移を表示。カード背面なしのフラット表示で、2セクションの間は広めに空ける
 - **種目別の記録推移**（上）: 種目セレクト＋指標切替（最大重量 / 総挙上量）。選択種目のセット記録をバケット集計して折れ線表示（プライマリ色）。見出し右に期間全体の平均値
@@ -80,6 +83,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - ルート（recharts 込み）は `React.lazy` で遅延読み込み
 
 ### 種目管理画面 `/exercises`
+
 - 種目名・カテゴリ（胸/背中/肩/腕/脚/有酸素/その他）を指定して種目を追加
 - 登録済み種目をカテゴリごとにセクション分けして一覧表示（カテゴリカラーのドットで区別）
 - 種目ごとに削除可能（確認ダイアログ表示）
@@ -87,6 +91,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - クエリパラメータ `?category=` で追加フォームのカテゴリを事前選択。`?from=` がある場合（記録画面の「種目を追加」導線）は種目追加成功後にその URL へ自動で戻る
 
 ### トレーニング記録一覧画面 `/record?date=YYYY-MM-DD`
+
 - ページタイトルに対象日を表示（`9月8日(月)のトレーニング` 形式）。日付はカレンダーからの遷移で決まるため、画面内に日付ピッカーは持たない（デフォルトは当日）
 - 指定日のトレーニング記録をカテゴリごとにセクション分けして表示
 - 各種目は「60kg×10回 / 60kg×8回」のようにセット内容を要約表示、クリックでその種目のセット入力画面へ
@@ -94,12 +99,14 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 戻るボタンでホーム画面へ
 
 ### 種目選択画面 `/record/new?date=YYYY-MM-DD`
+
 - カテゴリごとにセクション分けして、ユーザーが登録済みの種目を一覧表示
 - 種目が未登録のカテゴリは「種目を追加」ボタンを表示し、押下すると `/exercises` にそのカテゴリが事前入力された状態で遷移（保存後は本画面に戻る）
 - 種目をクリックするとセット入力画面 `/record/new/:exerciseId?date=...` へ
 - 戻るボタンで記録一覧画面へ
 
 ### セット入力画面 `/record/new/:exerciseId?date=YYYY-MM-DD`
+
 - 選択した種目・日付における記録を1セット=1行で表示（初期状態は1セット分の入力欄）
 - 重量・回数は横並び、下線のみ（枠なし）の入力欄。行の編集では保存せず、下部の「保存」ボタン押下時に一括で反映（`useSaveExerciseSets`）
   - 未入力（重量・回数とも空）の行は無視。画面から消した既存セットは保存時に削除。setNumber は表示順で採番し直す
@@ -108,6 +115,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 戻るボタンで種目選択画面へ
 
 ### 体重記録画面 `/body-weight?date=YYYY-MM-DD`
+
 - 指定日（デフォルト当日）の体重を入力・保存（保存済みの値があれば表示）
 - 保存完了時にトースト通知
 - 戻るボタンでホーム画面へ
@@ -139,7 +147,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 ## 開発ルール
 
-- 機能ごとに feature ブランチを切り、PR を作成する。`main` への直接 push は行わない
+- 機能ごとに feature ブランチを切り、PR を作成する。`main`, `dev` への直接 push は行わない
 - ディレクトリ構成:
   - コンポーネントはファイル・ディレクトリ名をアッパーキャメルにし、`Xxx/Xxx.tsx` + `Xxx.module.css` の単位で配置する（`pages` 配下も同様）
   - `src/components` は UI コンポーネント専用。ルーティングは `src/routes`、Provider は `src/providers` に定義する

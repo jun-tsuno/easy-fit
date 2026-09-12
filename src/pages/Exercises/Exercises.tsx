@@ -45,6 +45,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
       <p className={styles.rowName}>{exercise.name}</p>
       <Dialog.Root
         role="alertdialog"
+        placement="center"
         open={open}
         onOpenChange={(details) => setOpen(details.open)}
       >
@@ -60,7 +61,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         </Dialog.Trigger>
         <Portal>
           <Dialog.Backdrop />
-          <Dialog.Positioner>
+          <Dialog.Positioner px="4">
             <Dialog.Content>
               <Dialog.Header>
                 <Dialog.Title>種目を削除しますか?</Dialog.Title>
@@ -69,6 +70,9 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
                 <Dialog.Description>
                   「{exercise.name}」を削除します。この操作は取り消せません。
                 </Dialog.Description>
+                <p className={styles.warning}>
+                  記録済みのトレーニング記録がある場合、それらの記録は過去の分も含めて集計対象から外れます。
+                </p>
                 {deleteExercise.isError && (
                   <p className={styles.error}>削除に失敗しました。</p>
                 )}
