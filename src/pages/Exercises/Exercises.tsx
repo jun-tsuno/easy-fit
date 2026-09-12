@@ -172,6 +172,7 @@ export function ExercisesPage() {
             onValueChange={(details) =>
               setCategory((details.value[0] as ExerciseCategoryValue) ?? "")
             }
+            positioning={{ placement: "bottom-start", flip: false }}
           >
             <Select.Control>
               <Select.Trigger id="exercise-category">
