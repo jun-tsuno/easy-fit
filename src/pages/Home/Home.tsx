@@ -1,4 +1,4 @@
-import { Button, IconButton, Spinner } from "@chakra-ui/react";
+import { Button, IconButton, Skeleton, Spinner } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import {
   LuCalendarCheck,
@@ -11,8 +11,10 @@ import {
 } from "react-icons/lu";
 import { Link, useNavigate } from "react-router";
 import { Calendar } from "@/components/Calendar/Calendar";
+import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import { useBodyWeightsInRange } from "@/hooks/useBodyWeight";
+import { useExercises } from "@/hooks/useExercises";
 import { useWorkoutSetsInRange } from "@/hooks/useWorkoutSets";
 import {
   formatShortDate,
@@ -21,7 +23,10 @@ import {
   getWeekRange,
   toDateString,
 } from "@/utils/date";
+import { getExerciseCategory } from "@/utils/exerciseCategories";
 import styles from "./Home.module.css";
+
+const UNASSIGNED_COLOR = "oklch(0.55 0 0)";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -64,6 +69,7 @@ export function HomePage() {
     currentWeek.start,
     currentWeek.end,
   );
+  const { data: exercises } = useExercises();
 
   const weekSummary = useMemo(() => {
     const latestWeight = (weekWeights ?? [])
@@ -79,6 +85,39 @@ export function HomePage() {
       latestWeight: latestWeight ?? null,
     };
   }, [weekSets, weekWeights]);
+
+  // 今週の記録を種目ごとにグルーピングし、直近の総挙上量が多い順に並べる
+  const weekExerciseSummaries = useMemo(() => {
+    const exerciseById = new Map(
+      (exercises ?? []).map((exercise) => [exercise.id, exercise]),
+    );
+    const setsByExerciseId = new Map<string, NonNullable<typeof weekSets>>();
+    for (const set of weekSets ?? []) {
+      const sets = setsByExerciseId.get(set.exerciseId);
+      if (sets) sets.push(set);
+      else setsByExerciseId.set(set.exerciseId, [set]);
+    }
+
+    return Array.from(setsByExerciseId.entries())
+      .map(([exerciseId, sets]) => {
+        const exercise = exerciseById.get(exerciseId);
+        return {
+          exerciseId,
+          exerciseName: exercise?.name ?? "未設定の種目",
+          categoryColor: exercise
+            ? getExerciseCategory(exercise.category).color
+            : UNASSIGNED_COLOR,
+          setCount: sets.length,
+          totalReps: sets.reduce((sum, set) => sum + set.reps, 0),
+          maxWeight: Math.max(...sets.map((set) => set.weight)),
+          totalVolume: sets.reduce(
+            (sum, set) => sum + set.weight * set.reps,
+            0,
+          ),
+        };
+      })
+      .sort((a, b) => b.totalVolume - a.totalVolume);
+  }, [weekSets, exercises]);
 
   return (
     <PageContainer>
@@ -170,6 +209,57 @@ export function HomePage() {
               </div>
             </dl>
           )}
+
+          <div className={styles.exerciseSummary}>
+            <h3 className={styles.exerciseSummaryTitle}>種目別の記録</h3>
+            {isWeekPending ? (
+              <div className={styles.exerciseList}>
+                <Skeleton height="4.25rem" borderRadius="var(--radius-card)" />
+                <Skeleton height="4.25rem" borderRadius="var(--radius-card)" />
+                <Skeleton height="4.25rem" borderRadius="var(--radius-card)" />
+              </div>
+            ) : weekExerciseSummaries.length === 0 ? (
+              <p className={styles.emptyText}>
+                この週のトレーニング記録はまだありません。
+              </p>
+            ) : (
+              <ul className={styles.exerciseList}>
+                {weekExerciseSummaries.map((item) => (
+                  <li key={item.exerciseId} className={styles.exerciseItem}>
+                    <div className={styles.exerciseItemHead}>
+                      <CategoryDot color={item.categoryColor} />
+                      <span className={styles.exerciseName}>
+                        {item.exerciseName}
+                      </span>
+                    </div>
+                    <dl className={styles.exerciseStats}>
+                      <div className={styles.exerciseStat}>
+                        <dt className={styles.exerciseStatLabel}>セット数</dt>
+                        <dd className={styles.exerciseStatValue}>
+                          {item.setCount}
+                          <span className={styles.summaryUnit}>セット</span>
+                        </dd>
+                      </div>
+                      <div className={styles.exerciseStat}>
+                        <dt className={styles.exerciseStatLabel}>Rep数</dt>
+                        <dd className={styles.exerciseStatValue}>
+                          {item.totalReps}
+                          <span className={styles.summaryUnit}>回</span>
+                        </dd>
+                      </div>
+                      <div className={styles.exerciseStat}>
+                        <dt className={styles.exerciseStatLabel}>最大重量</dt>
+                        <dd className={styles.exerciseStatValue}>
+                          {item.maxWeight}
+                          <span className={styles.summaryUnit}>kg</span>
+                        </dd>
+                      </div>
+                    </dl>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
       </main>
 
