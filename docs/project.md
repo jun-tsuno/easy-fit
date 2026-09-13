@@ -4,6 +4,33 @@
 
 このドキュメントはセッション間で開発状況を共有するためのもの。実装済みの画面構成・データモデルをまとめる。更新のたびに実態に合わせて書き直すこと。
 
+## セットアップ
+
+```bash
+pnpm install
+```
+
+## 開発
+
+```bash
+pnpm dev
+```
+
+Amplifyバックエンド(認証・データ)をローカルで使う場合は、AWS認証情報を設定した上で以下を実行する。`amplify_outputs.json` が生成されるまでフロントエンドはバックエンドに接続されない。
+
+```bash
+pnpm ampx sandbox
+```
+
+## その他コマンド
+
+```bash
+pnpm build      # 本番ビルド（tsc -b + vite build）
+pnpm lint       # Biomeでチェック
+pnpm lint:fix   # Biomeで自動修正
+pnpm format     # Biomeでフォーマット
+```
+
 ## 技術スタック
 
 | 領域             | 技術                                                                                                                            |
@@ -43,7 +70,6 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - **Exercise**（種目マスタ）: `name`, `category`, `owner`。ユーザーが登録した種目を保持し、記録画面の種目選択に使う。
 - **WorkoutSet**（トレーニング記録・1セット=1レコード）: `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`。セカンダリインデックス `owner + date`（`listWorkoutSetsByDate`）でカレンダー・日別表示に対応。
   - セカンダリインデックス `exerciseId + date`（`listWorkoutSetsByExerciseDate`）で履歴画面の種目別クエリに対応。
-    - **⚠ サンドボックス/本番のスキーマ再デプロイ（`ampx sandbox` など）が必要。** 反映前は履歴画面の種目別セクションでクエリエラーになる。
 - **BodyWeight**（体重記録）: `date`, `weight`, `owner`。セカンダリインデックス `owner + date`（`listBodyWeightsByDate`）。
 
 ## 認証（`amplify/auth/resource.ts`）
@@ -61,7 +87,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 
 ### ホーム画面 `/`
 
-- ヘッダー: アプリタイトル、ログアウトボタン（種目への導線は下部のグローバルメニューに移動）
+- ヘッダー: ロゴ画像、マイページ画面 `/mypage` への導線（アイコンボタン）
 - カレンダーをメインコンテンツとして配置（`src/components/Calendar/Calendar.tsx`、日曜始まり・6週間固定表示）
   - 月送り（前月/次月）と「今月」ボタン（当月以外を表示中のみ）で移動
   - トレーニング記録がある日はダンベルアイコン、体重記録がある日は体重計アイコンをセル下部に表示（数値は出さない）
@@ -101,7 +127,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 ### 種目選択画面 `/record/new?date=YYYY-MM-DD`
 
 - カテゴリごとにセクション分けして、ユーザーが登録済みの種目を一覧表示
-- 種目が未登録のカテゴリは「種目を追加」ボタンを表示し、押下すると `/exercises` にそのカテゴリが事前入力された状態で遷移（保存後は本画面に戻る）
+- 各カテゴリに常に「種目を追加」ボタンを表示し、押下すると `/exercises` にそのカテゴリが事前入力された状態で遷移（保存後は本画面に戻る）
 - 種目をクリックするとセット入力画面 `/record/new/:exerciseId?date=...` へ
 - 戻るボタンで記録一覧画面へ
 
@@ -120,6 +146,18 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
 - 保存完了時にトースト通知
 - 戻るボタンでホーム画面へ
 
+### マイページ画面 `/mypage`
+
+- ホーム画面ヘッダーのアイコンボタンから遷移
+- ユーザー名（Cognitoのusername）を表示
+- 月送り可能な「トレーニング実施日数」（表示中の月にトレーニング記録がある日数）を表示
+- ログアウトボタン（アプリ内のログアウト導線はここのみ）
+
+## エラーハンドリング
+
+- `ErrorBoundary`（`src/components/ErrorBoundary/`）: アプリ全体（`main.tsx`）を包み、レンダリング時例外を捕捉して `ErrorFallback` を表示する
+- `RouteErrorBoundary`（`src/routes/RouteErrorBoundary/`）: React Router のルート `errorElement` に設定。404（存在しないパス）は専用メッセージ、それ以外は汎用の `ErrorFallback` を表示する
+
 ## 画面遷移
 
 ```
@@ -131,6 +169,8 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
  └─ 種目 ───> /exercises
 
 / (ホーム / カレンダー)
+ ├─ ヘッダーのアイコンボタン ──────> /mypage
+ │                                        └─ ログアウト / 戻る ──> /login / /
  ├─ カレンダーの日付タップ ────────> /record?date=<日付>
  ├─ 「本日のトレーニングを記録」────> /record?date=<本日>
  ├─ 週サマリーの体重リンク ────────> /body-weight?date=<本日>
@@ -139,7 +179,7 @@ owner ベースの認可（`allow.owner().identityClaim('sub')`）により、�
       ├─ 「+」 ──────────> /record/new
       │                      ├─ 種目クリック ──> /record/new/:exerciseId
       │                      │                     └─ 戻る ──> /record/new
-      │                      ├─ 種目0件のカテゴリ「種目を追加」──> /exercises?category=..&from=/record/new
+      │                      ├─ 「種目を追加」（常時表示）──> /exercises?category=..&from=/record/new
       │                      │                                        └─ 保存後 ──> /record/new
       │                      └─ 戻る ──> /record
       └─ 種目クリック（記録済み） ──> /record/new/:exerciseId
