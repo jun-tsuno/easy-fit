@@ -1,12 +1,7 @@
-import {
-  createListCollection,
-  Portal,
-  SegmentGroup,
-  Select,
-  Spinner,
-} from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { SegmentGroup, Spinner } from "@chakra-ui/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LuDumbbell, LuScale } from "react-icons/lu";
+import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
 import {
   StatsLineChart,
@@ -17,12 +12,18 @@ import { useExercises } from "@/hooks/useExercises";
 import { useWorkoutSetsByExerciseInRange } from "@/hooks/useWorkoutSets";
 import { getStatsBuckets, type StatsPeriod } from "@/utils/date";
 import {
+  EXERCISE_CATEGORIES,
+  isExerciseCategoryValue,
+} from "@/utils/exerciseCategories";
+import {
   aggregateBodyWeights,
   aggregateWorkoutSets,
   average,
   type WorkoutMetric,
 } from "@/utils/stats";
 import styles from "./History.module.css";
+
+const UNCATEGORIZED = "uncategorized";
 
 const PERIOD_ITEMS: { value: StatsPeriod; label: string }[] = [
   { value: "week", label: "週" },
@@ -146,24 +147,54 @@ function BodyWeightSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
 
 function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
   const { data: exercises, isPending: isExercisesPending } = useExercises();
+  const [categoryValue, setCategoryValue] = useState("");
   const [exerciseId, setExerciseId] = useState("");
   const [metric, setMetric] = useState<WorkoutMetric>("maxWeight");
 
-  useEffect(() => {
-    if (exerciseId === "" && exercises && exercises.length > 0) {
-      setExerciseId(exercises[0].id);
-    }
-  }, [exercises, exerciseId]);
+  const categoryGroups = useMemo(() => {
+    const items = exercises ?? [];
+    const groups = EXERCISE_CATEGORIES.map((cat) => ({
+      value: cat.value as string,
+      label: cat.label,
+      color: cat.color,
+      items: items.filter((exercise) => exercise.category === cat.value),
+    })).filter((group) => group.items.length > 0);
 
-  const collection = useMemo(
-    () =>
-      createListCollection({
-        items: exercises ?? [],
-        itemToString: (item) => item.name,
-        itemToValue: (item) => item.id,
-      }),
-    [exercises],
+    const uncategorized = items.filter(
+      (exercise) => !isExerciseCategoryValue(exercise.category ?? ""),
+    );
+    if (uncategorized.length > 0) {
+      groups.push({
+        value: UNCATEGORIZED,
+        label: "未分類",
+        color: "var(--color-fg-muted)",
+        items: uncategorized,
+      });
+    }
+    return groups;
+  }, [exercises]);
+
+  const currentGroup = categoryGroups.find(
+    (group) => group.value === categoryValue,
   );
+
+  // 種目データ取得後、未選択なら先頭のカテゴリを自動選択する
+  useEffect(() => {
+    if (categoryValue === "" && categoryGroups.length > 0) {
+      setCategoryValue(categoryGroups[0].value);
+    }
+  }, [categoryGroups, categoryValue]);
+
+  // カテゴリ切替などで選択中の種目が属さなくなった場合、そのカテゴリの先頭種目を選び直す
+  useEffect(() => {
+    if (!currentGroup) return;
+    const stillValid = currentGroup.items.some(
+      (exercise) => exercise.id === exerciseId,
+    );
+    if (!stillValid) {
+      setExerciseId(currentGroup.items[0]?.id ?? "");
+    }
+  }, [currentGroup, exerciseId]);
 
   const {
     data: sets,
@@ -206,33 +237,25 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
       ) : (
         <>
           <div className={styles.controls}>
-            <Select.Root
-              collection={collection}
-              value={exerciseId ? [exerciseId] : []}
-              onValueChange={(details) => setExerciseId(details.value[0] ?? "")}
-              size="md"
-            >
-              <Select.Control>
-                <Select.Trigger>
-                  <Select.ValueText placeholder="種目を選択" />
-                </Select.Trigger>
-                <Select.IndicatorGroup>
-                  <Select.Indicator />
-                </Select.IndicatorGroup>
-              </Select.Control>
-              <Portal>
-                <Select.Positioner>
-                  <Select.Content>
-                    {(exercises ?? []).map((exercise) => (
-                      <Select.Item item={exercise} key={exercise.id}>
-                        <Select.ItemText>{exercise.name}</Select.ItemText>
-                        <Select.ItemIndicator />
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Positioner>
-              </Portal>
-            </Select.Root>
+            <TabRow
+              items={categoryGroups.map((group) => ({
+                value: group.value,
+                label: group.label,
+                color: group.color,
+              }))}
+              value={categoryValue}
+              onChange={setCategoryValue}
+              ariaLabel="カテゴリ"
+            />
+            <TabRow
+              items={(currentGroup?.items ?? []).map((exercise) => ({
+                value: exercise.id,
+                label: exercise.name,
+              }))}
+              value={exerciseId}
+              onChange={setExerciseId}
+              ariaLabel="種目"
+            />
 
             <SegmentGroup.Root
               size="md"
@@ -274,5 +297,54 @@ function ExerciseSection({ buckets, rangeStart, rangeEnd }: SectionProps) {
         </>
       )}
     </section>
+  );
+}
+
+type TabItem = { value: string; label: string; color?: string };
+
+function TabRow({
+  items,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  items: TabItem[];
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabel: string;
+}) {
+  const activeRef = useRef<HTMLButtonElement | null>(null);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 選択値が変わるたびアクティブなタブへスクロールする
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [value]);
+
+  return (
+    <div className={styles.tabScroll} role="tablist" aria-label={ariaLabel}>
+      {items.map((item) => {
+        const isActive = item.value === value;
+        return (
+          <button
+            key={item.value}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            ref={isActive ? activeRef : undefined}
+            className={
+              isActive ? `${styles.tab} ${styles.tabActive}` : styles.tab
+            }
+            onClick={() => onChange(item.value)}
+          >
+            {item.color && <CategoryDot color={item.color} />}
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
