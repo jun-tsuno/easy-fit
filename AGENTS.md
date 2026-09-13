@@ -1,16 +1,16 @@
 # AGENTS.md
 
-このリポジトリで作業する AI エージェント向けのインストラクション。
+Instructions for AI agents working in this repository.
 
-## 基本方針
+## Basic policy
 
-- プロジェクトの要件・技術構成は [docs/project.md](docs/project.md) を参照すること。
-- セッションの中で要件が変わったり追加されたりする場合は、[docs/project.md](docs/project.md) も実態に合わせて更新すること。
-- 既存コードの書き方（命名・ディレクトリ構成・スタイリング方針・エラーハンドリング等）を踏襲すること。
-- Issue の内容や指示の中で不明な点があれば、推測で進めずユーザーに質問すること。
+- Refer to [docs/project.md](docs/project.md) for the project's requirements and technical composition.
+- If requirements change or are added during a session, update [docs/project.md](docs/project.md) to match.
+- Follow the existing code conventions (naming, directory structure, styling approach, error handling, etc.).
+- If anything in an issue or instruction is unclear, ask the user instead of guessing.
 
-## 作業前後の確認
+## Checks before and after work
 
-- パッケージマネージャは pnpm を使用する（`pnpm-lock.yaml` で管理）。
-- 変更後は `pnpm lint`（Biome）と `pnpm build`（`tsc -b` + Vite）が通ることを確認する。
-- `main` への直接 push は行わない。機能ごとに feature ブランチを切り、PR を作成する。
+- Use pnpm as the package manager (managed via `pnpm-lock.yaml`).
+- After making changes, confirm that `pnpm lint` (Biome) and `pnpm build` (`tsc -b` + Vite) pass.
+- Do not push directly to `main`. Create a feature branch per change and open a PR.

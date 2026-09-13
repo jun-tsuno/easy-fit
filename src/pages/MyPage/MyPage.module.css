@@ -14,9 +14,61 @@
 }
 
 .username {
-  margin: 0.25rem 0 0;
-  font-size: 0.875rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.nicknameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.nicknameFormWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.nicknameForm {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.nicknameInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.nicknameInputGroup :global(.chakra-input.chakra-input) {
+  border-inline-width: 0;
+  border-block-start-width: 0;
+}
+
+.nicknameInputGroup :global(.chakra-input.chakra-input):focus,
+.nicknameInputGroup :global(.chakra-input.chakra-input):focus-visible {
+  border-inline-width: 0;
+  border-block-start-width: 0;
+  box-shadow: 0 1px 0 0 var(--color-accent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.75rem;
   color: var(--color-fg-muted);
+}
+
+.error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-destructive);
 }
 
 .section {

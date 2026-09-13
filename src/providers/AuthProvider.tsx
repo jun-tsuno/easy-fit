@@ -1,7 +1,9 @@
 import {
   signIn as amplifySignIn,
   signOut as amplifySignOut,
+  fetchUserAttributes,
   getCurrentUser,
+  updateUserAttributes,
 } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { createContext, use, useCallback, useEffect, useState } from "react";
@@ -9,6 +11,7 @@ import { createContext, use, useCallback, useEffect, useState } from "react";
 type AuthUser = {
   username: string;
   userId: string;
+  nickname: string | null;
 };
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
@@ -18,14 +21,18 @@ type AuthContextValue = {
   user: AuthUser | null;
   signIn: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateNickname: (nickname: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function loadCurrentUser(): Promise<AuthUser | null> {
   try {
-    const { username, userId } = await getCurrentUser();
-    return { username, userId };
+    const [{ username, userId }, attributes] = await Promise.all([
+      getCurrentUser(),
+      fetchUserAttributes(),
+    ]);
+    return { username, userId, nickname: attributes.nickname ?? null };
   } catch {
     return null;
   }
@@ -72,8 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await refresh();
   }, [refresh]);
 
+  const updateNickname = useCallback(
+    async (nickname: string) => {
+      await updateUserAttributes({ userAttributes: { nickname } });
+      await refresh();
+    },
+    [refresh],
+  );
+
   return (
-    <AuthContext value={{ status, user, signIn, signOut }}>
+    <AuthContext value={{ status, user, signIn, signOut, updateNickname }}>
       {children}
     </AuthContext>
   );
