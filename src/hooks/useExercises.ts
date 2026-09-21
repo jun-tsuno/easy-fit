@@ -39,6 +39,30 @@ export function useCreateExercise() {
   });
 }
 
+type UpdateExerciseInput = {
+  id: string;
+  name: string;
+};
+
+// id は変えずに name だけ更新する。WorkoutSet は exerciseId で参照しているため、
+// 過去の記録との紐づきは保たれる
+export function useUpdateExercise() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateExerciseInput) => {
+      const { data, errors } = await client.models.Exercise.update(input);
+      if (errors) {
+        throw new Error(errors.map((error) => error.message).join(", "));
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: exercisesQueryKey });
+    },
+  });
+}
+
 export function useDeleteExercise() {
   const queryClient = useQueryClient();
 

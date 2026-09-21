@@ -114,6 +114,7 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 
 - Add an exercise by specifying its name and category (chest / back / shoulders / arms / legs / cardio / other)
 - Registered exercises are listed grouped by category (distinguished by a category-color dot)
+- Each exercise's name can be edited inline via a pencil icon (`useUpdateExercise`). Only `name` is updated and the `id` stays the same, so existing `WorkoutSet` records (linked by `exerciseId`) keep their association. Category can't be changed. Unchanged edits don't trigger an update call
 - Each exercise can be deleted (with a confirmation dialog)
 - No back button since this is a top-level tab screen (navigation happens via the global menu)
 - The `?category=` query param pre-selects the category in the add form. If `?from=` is present (from the "Add exercise" flow on the record screen), it navigates back to that URL automatically after a successful add
