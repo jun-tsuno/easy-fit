@@ -9,7 +9,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { type FormEvent, useState } from "react";
-import { LuDumbbell, LuTrash2 } from "react-icons/lu";
+import { LuCheck, LuDumbbell, LuPencil, LuTrash2, LuX } from "react-icons/lu";
 import { useNavigate, useSearchParams } from "react-router";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
@@ -17,6 +17,7 @@ import {
   useCreateExercise,
   useDeleteExercise,
   useExercises,
+  useUpdateExercise,
 } from "@/hooks/useExercises";
 import type { Exercise, ExerciseCategoryValue } from "@/types/exercise";
 import {
@@ -33,16 +34,97 @@ const categoryCollection = createListCollection({
 
 function ExerciseRow({ exercise }: { exercise: Exercise }) {
   const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(exercise.name);
   const deleteExercise = useDeleteExercise();
+  const updateExercise = useUpdateExercise();
 
   const handleDelete = async () => {
     await deleteExercise.mutateAsync(exercise.id);
     setOpen(false);
   };
 
+  const startEditing = () => {
+    setEditName(exercise.name);
+    updateExercise.reset();
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    updateExercise.reset();
+  };
+
+  const trimmedName = editName.trim();
+
+  const handleRename = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!trimmedName) return;
+    if (trimmedName === exercise.name) {
+      setIsEditing(false);
+      return;
+    }
+    try {
+      await updateExercise.mutateAsync({ id: exercise.id, name: trimmedName });
+      setIsEditing(false);
+    } catch {
+      // エラー表示は updateExercise.isError で行う
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <li className={styles.row}>
+        <form onSubmit={handleRename} className={styles.editForm}>
+          <div className={styles.editRow}>
+            <Input
+              size="sm"
+              aria-label="種目名"
+              value={editName}
+              onChange={(event) => setEditName(event.target.value)}
+              autoFocus
+            />
+            <IconButton
+              type="submit"
+              variant="ghost"
+              size="sm"
+              aria-label="保存"
+              loading={updateExercise.isPending}
+              disabled={!trimmedName}
+            >
+              <LuCheck />
+            </IconButton>
+            <IconButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              colorPalette="gray"
+              aria-label="キャンセル"
+              disabled={updateExercise.isPending}
+              onClick={cancelEditing}
+            >
+              <LuX />
+            </IconButton>
+          </div>
+          {updateExercise.isError && (
+            <p className={styles.error}>種目名の更新に失敗しました。</p>
+          )}
+        </form>
+      </li>
+    );
+  }
+
   return (
     <li className={styles.row}>
       <p className={styles.rowName}>{exercise.name}</p>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        aria-label={`${exercise.name}の名前を編集`}
+        onClick={startEditing}
+      >
+        <LuPencil />
+      </IconButton>
       <Dialog.Root
         role="alertdialog"
         placement="center"

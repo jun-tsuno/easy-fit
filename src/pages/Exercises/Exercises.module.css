@@ -105,6 +105,19 @@
   font-weight: 500;
 }
 
+.editForm {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editRow {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .dotSpacing {
   margin-right: 0.75rem;
 }
