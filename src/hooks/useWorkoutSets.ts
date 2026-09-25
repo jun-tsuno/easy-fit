@@ -1,38 +1,50 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/lib/amplifyClient";
+import { useAuth } from "@/providers/AuthProvider";
 
 function workoutSetsQueryKey(date: string, exerciseId?: string) {
   return exerciseId ? ["workoutSets", date, exerciseId] : ["workoutSets", date];
 }
 
-async function fetchWorkoutSetsByDate(date: string) {
-  const { data, errors } = await client.models.WorkoutSet.list({
-    filter: { date: { eq: date } },
-  });
+// owner + date の専用GSI(listWorkoutSetsByDate)を使い、date をソートキー条件に
+// した範囲クエリにする。汎用 list() + filter だと owner で絞ったあとに date を
+// 後掛けフィルタするだけになり、記録数が増えるほど非効率になるため
+async function fetchWorkoutSetsByDate(owner: string, date: string) {
+  const { data, errors } = await client.models.WorkoutSet.listWorkoutSetsByDate(
+    { owner, date: { eq: date } },
+  );
   if (errors) throw new Error(errors.map((error) => error.message).join(", "));
   return data;
 }
 
 export function useWorkoutSetsByDate(date: string) {
+  const { user } = useAuth();
   return useQuery({
     queryKey: workoutSetsQueryKey(date),
-    queryFn: () => fetchWorkoutSetsByDate(date),
+    queryFn: () => fetchWorkoutSetsByDate(user?.userId ?? "", date),
+    enabled: !!user,
   });
 }
 
-async function fetchWorkoutSetsInRange(start: string, end: string) {
-  const { data, errors } = await client.models.WorkoutSet.list({
-    filter: { and: [{ date: { ge: start } }, { date: { le: end } }] },
-    limit: 1000,
-  });
+async function fetchWorkoutSetsInRange(
+  owner: string,
+  start: string,
+  end: string,
+) {
+  const { data, errors } = await client.models.WorkoutSet.listWorkoutSetsByDate(
+    { owner, date: { between: [start, end] } },
+    { limit: 1000 },
+  );
   if (errors) throw new Error(errors.map((error) => error.message).join(", "));
   return data;
 }
 
 export function useWorkoutSetsInRange(start: string, end: string) {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["workoutSets", "range", start, end],
-    queryFn: () => fetchWorkoutSetsInRange(start, end),
+    queryFn: () => fetchWorkoutSetsInRange(user?.userId ?? "", start, end),
+    enabled: !!user,
   });
 }
 

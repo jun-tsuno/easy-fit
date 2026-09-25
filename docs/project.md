@@ -68,9 +68,9 @@ pnpm format     # Format with Biome
 Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each user can only operate on their own data.
 
 - **Exercise** (exercise master): `name`, `category`, `owner`. Holds the exercises a user has registered, used for exercise selection on the record screens.
-- **WorkoutSet** (one record per set): `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`. A secondary index on `owner + date` (`listWorkoutSetsByDate`) supports the calendar and per-day views.
+- **WorkoutSet** (one record per set): `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`. A secondary index on `owner + date` (`listWorkoutSetsByDate`) supports the calendar and per-day views — used by `useWorkoutSetsByDate` / `useWorkoutSetsInRange` (`src/hooks/useWorkoutSets.ts`), which pass the signed-in user's `owner` value (`useAuth()`'s `userId`, i.e. the Cognito `sub`) as the index's partition key rather than doing a generic `list()` + date filter
   - A secondary index on `exerciseId + date` (`listWorkoutSetsByExerciseDate`) supports per-exercise queries on the History screen.
-- **BodyWeight** (body weight record): `date`, `weight`, `owner`. Secondary index on `owner + date` (`listBodyWeightsByDate`).
+- **BodyWeight** (body weight record): `date`, `weight`, `owner`. Secondary index on `owner + date` (`listBodyWeightsByDate`) — likewise used by `useBodyWeightByDate` / `useBodyWeightsInRange` (`src/hooks/useBodyWeight.ts`).
 
 ## Auth (`amplify/auth/resource.ts`)
 
