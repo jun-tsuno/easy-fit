@@ -37,7 +37,7 @@ pnpm format     # Format with Biome
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Frontend          | React 19 + Vite, TypeScript (strict)                                                                                                            |
 | Routing           | React Router v8 (`createBrowserRouter`)                                                                                                         |
-| Server state      | TanStack React Query v5                                                                                                                         |
+| Server state      | TanStack React Query v5 (`src/lib/queryClient.ts`; global `staleTime` is 1 minute, not the library default of 0, to avoid refetching on every re-render of an already-fetched query key) |
 | Backend           | AWS Amplify Gen2 (`defineData`, `defineAuth`)                                                                                                   |
 | Auth              | Amazon Cognito (email + password, no sign-up flow, users are registered manually)                                                               |
 | UI                | Chakra UI v3 + CSS Modules (layout/custom styles use CSS Modules; component variants etc. use Chakra's theme/recipe API)                        |
@@ -68,9 +68,9 @@ pnpm format     # Format with Biome
 Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each user can only operate on their own data.
 
 - **Exercise** (exercise master): `name`, `category`, `owner`. Holds the exercises a user has registered, used for exercise selection on the record screens.
-- **WorkoutSet** (one record per set): `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`. A secondary index on `owner + date` (`listWorkoutSetsByDate`) supports the calendar and per-day views.
+- **WorkoutSet** (one record per set): `date`, `exerciseId`, `weight`, `reps`, `setNumber`, `owner`. A secondary index on `owner + date` (`listWorkoutSetsByDate`) supports the calendar and per-day views — used by `useWorkoutSetsByDate` / `useWorkoutSetsInRange` (`src/hooks/useWorkoutSets.ts`), which pass the signed-in user's `owner` value (`useAuth()`'s `userId`, i.e. the Cognito `sub`) as the index's partition key rather than doing a generic `list()` + date filter
   - A secondary index on `exerciseId + date` (`listWorkoutSetsByExerciseDate`) supports per-exercise queries on the History screen.
-- **BodyWeight** (body weight record): `date`, `weight`, `owner`. Secondary index on `owner + date` (`listBodyWeightsByDate`).
+- **BodyWeight** (body weight record): `date`, `weight`, `owner`. Secondary index on `owner + date` (`listBodyWeightsByDate`) — likewise used by `useBodyWeightByDate` / `useBodyWeightsInRange` (`src/hooks/useBodyWeight.ts`).
 
 ## Auth (`amplify/auth/resource.ts`)
 
@@ -78,6 +78,33 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 - Redirects to `/login` when not signed in (`ProtectedRoute`)
 - Sessions are kept long-lived (roughly 30 days) so users don't need to sign in repeatedly
 - The `nickname` user attribute (mutable, required) is used as the user's display name in the app, to avoid exposing the Cognito `sub`/username
+
+### Manually resetting a user's password (AWS CLI)
+
+Since there's no sign-up/self-service flow, use the AWS CLI against the Cognito user pool (`user_pool_id` / `aws_region` in `amplify_outputs.json`) to reset a user's password. Requires AWS credentials with `cognito-idp:AdminSetUserPassword` (and `cognito-idp:ListUsers` to look up the username).
+
+Look up the username by email if unknown:
+
+```bash
+aws cognito-idp list-users \
+  --user-pool-id {user-pool-id} \
+  --filter 'email = "user@example.com"' \
+  --region {region}
+```
+
+Set the password:
+
+```bash
+aws cognito-idp admin-set-user-password \
+  --user-pool-id {user-pool-id} \
+  --username {user-name} \
+  --password {password} \
+  --permanent \
+  --region {region}
+```
+
+- With `--permanent`: the given password is set immediately as the user's real password; they can sign in with it right away (no forced change)
+- Without `--permanent`: it's set as a temporary password, the user's status becomes `FORCE_CHANGE_PASSWORD`, and they must set a new password (`NEW_PASSWORD_REQUIRED` challenge) on next sign-in
 
 ## Screens (implemented)
 
@@ -89,19 +116,19 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 ### Home screen `/`
 
 - Header: logo image, a link (icon button) to the My Page screen `/mypage`
-- The calendar is the main content (`src/components/Calendar/Calendar.tsx`, starts on Sunday, fixed 6-week display)
+- The calendar is the main content (`src/components/Calendar/Calendar.tsx`, starts on Sunday, fixed 6-week display; this is only the calendar grid's display convention — it's independent of the Monday-start training week described below)
   - Navigate with month forward/back and a "This month" button (shown only when not viewing the current month)
   - Days with a workout record show a dumbbell icon and days with a body-weight record show a scale icon at the bottom of the cell (no numeric values shown)
   - Today's cell is highlighted
-  - Tapping a date navigates to that day's workout record screen `/record?date=<date>`
+  - Tapping a date selects it (highlighted like today's cell) and updates the weekly record summary below to that date's week, instead of navigating away
   - Fetches `WorkoutSet` / `BodyWeight` for the displayed month's 6-week range in a single date-range query each (`useWorkoutSetsInRange` / `useBodyWeightsInRange`)
-- Weekly record summary: always shows "this week" (Sunday through Saturday including today, independent of the calendar's displayed month) — "training days", "total sets", "total volume" (Σ weight × reps), and "body weight" (latest record that week). The body-weight value links to `/body-weight?date=<today>` (rendered in normal text color, not the accent color)
-  - Per-exercise summary: groups this week's `WorkoutSet` records by `exerciseId` and lists "sets", "total reps", and "max weight" for each exercise, sorted by total volume (weight × reps) descending. Exercises missing from the master list show as "Unregistered exercise". Shows a skeleton while loading and an empty-state message when there are no records for the week
-- A fixed "Record today's workout" button at the bottom → `/record?date=<today>`
+- Weekly record summary: shows the week (Monday through Sunday, `getWeekRange` in `src/utils/date.ts`) containing the selected date — defaults to the current week on load. The heading is the fixed "週の記録" plus the week's date range (e.g. "9/22 – 9/28"); it doesn't distinguish the current week from a past one. Shows "training days", "total sets", "total volume" (Σ weight × reps), and "body weight" (latest record that week). The body-weight value always links to `/body-weight?date=<today>` regardless of which week is displayed (rendered in normal text color, not the accent color)
+  - Per-exercise summary: groups the selected week's `WorkoutSet` records by `exerciseId`, then by exercise category (chest / back / shoulders / arms / legs / cardio / other, same grouping as the record list screen), each showing "sets", "total reps", and "max weight", sorted by total volume (weight × reps) descending within its category. Exercises missing from the master list are grouped under "Unregistered". Shows a skeleton while loading and an empty-state message when there are no records for the week
+- A fixed "Record a workout" button at the bottom → `/record?date=<today>` (always defaults to today; the record screen's own date picker is used to record a different date)
 
 ### History screen `/history` (`src/pages/History/`)
 
-- A toggle at the top switches the review period (Week = last 7 days, daily buckets / Month = last 30 days, daily buckets / Year = last 12 months, monthly buckets). Selected via `SegmentGroup`, defaults to "Week"
+- A toggle at the top switches the review period (Week = last 7 days, daily buckets / Month = last 30 days, daily buckets / Year = last 12 months, monthly buckets). Selected via `SegmentGroup`, defaults to "Month"
 - Aggregates the period into buckets (day or month) and shows the trend as a line chart (`StatsLineChart` = `@chakra-ui/charts`). Flat display with no card background; generous spacing between the two sections
 - **Per-exercise trend** (top): exercise select + metric toggle (max weight / total volume). Aggregates the selected exercise's sets per bucket and shows a line chart (primary color). The period's overall average is shown to the right of the heading
   - Per-exercise queries use `WorkoutSet`'s `listWorkoutSetsByExerciseDate` (the `exerciseId + date` GSI)
@@ -121,7 +148,8 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 
 ### Workout record list screen `/record?date=YYYY-MM-DD`
 
-- The page title shows the target date (e.g. "Workout for Mon, Sep 8"). Since the date comes from calendar navigation, there's no in-page date picker (defaults to today)
+- The page title is the fixed "トレーニング記録" (not date-specific, since the date is now changeable in-page)
+- A date field (native `<input type="date">`, same convention as the Body-weight screen) lets the user change the target date; defaults to today (`useDateParam`)
 - Shows the given day's workout records grouped by category
 - Each exercise summarizes its sets (e.g. "60kg×10 / 60kg×8"); clicking navigates to that exercise's set-input screen
 - The header's "+" button → exercise selection screen `/record/new?date=...`
@@ -174,11 +202,11 @@ Global menu (always shown at the bottom of every authenticated screen, left to r
 / (Home / calendar)
  ├─ Header icon button ────────────> /mypage
  │                                        └─ Sign out / back ──> /login / /
- ├─ Tap a calendar date ────────────> /record?date=<date>
- ├─ "Record today's workout" ───────> /record?date=<today>
+ ├─ Tap a calendar date ────────────> updates the weekly summary in place (no navigation)
+ ├─ "Record a workout" ─────────────> /record?date=<today>
  ├─ Weekly summary body-weight link ─> /body-weight?date=<today>
  │                                        └─ back ──> /
- └─ /record
+ └─ /record (date changeable in-page via a date picker)
       ├─ "+" ──────────────> /record/new
       │                        ├─ click an exercise ──> /record/new/:exerciseId
       │                        │                          └─ back ──> /record/new

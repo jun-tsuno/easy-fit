@@ -43,14 +43,16 @@ export function getCalendarDays(year: number, month: number): Date[] {
   return days;
 }
 
-/** 指定日を含む週(日曜〜土曜)の開始日・終了日を "YYYY-MM-DD" で返す */
+/** 指定日を含む週(月曜〜日曜)の開始日・終了日を "YYYY-MM-DD" で返す */
 export function getWeekRange(dateString: string): {
   start: string;
   end: string;
 } {
   const date = parseDateString(dateString);
   const start = new Date(date);
-  start.setDate(start.getDate() - start.getDay());
+  const day = start.getDay(); // 0(日)〜6(土)
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + diffToMonday);
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
   return { start: toDateString(start), end: toDateString(end) };

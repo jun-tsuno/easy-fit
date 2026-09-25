@@ -41,7 +41,7 @@ function formatKg(value: number | null): string {
 }
 
 export function HistoryPage() {
-  const [period, setPeriod] = useState<StatsPeriod>("week");
+  const [period, setPeriod] = useState<StatsPeriod>("month");
 
   const buckets = useMemo(() => getStatsBuckets(period), [period]);
   const range = useMemo(

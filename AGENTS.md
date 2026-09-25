@@ -13,4 +13,4 @@ Instructions for AI agents working in this repository.
 
 - Use pnpm as the package manager (managed via `pnpm-lock.yaml`).
 - After making changes, confirm that `pnpm lint` (Biome) and `pnpm build` (`tsc -b` + Vite) pass.
-- Do not push directly to `main`. Create a feature branch per change and open a PR.
+- Do not push directly to `main`.
