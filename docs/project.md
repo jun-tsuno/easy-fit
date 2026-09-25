@@ -89,15 +89,15 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 ### Home screen `/`
 
 - Header: logo image, a link (icon button) to the My Page screen `/mypage`
-- The calendar is the main content (`src/components/Calendar/Calendar.tsx`, starts on Sunday, fixed 6-week display)
+- The calendar is the main content (`src/components/Calendar/Calendar.tsx`, starts on Sunday, fixed 6-week display; this is only the calendar grid's display convention — it's independent of the Monday-start training week described below)
   - Navigate with month forward/back and a "This month" button (shown only when not viewing the current month)
   - Days with a workout record show a dumbbell icon and days with a body-weight record show a scale icon at the bottom of the cell (no numeric values shown)
   - Today's cell is highlighted
-  - Tapping a date navigates to that day's workout record screen `/record?date=<date>`
+  - Tapping a date selects it (highlighted like today's cell) and updates the weekly record summary below to that date's week, instead of navigating away
   - Fetches `WorkoutSet` / `BodyWeight` for the displayed month's 6-week range in a single date-range query each (`useWorkoutSetsInRange` / `useBodyWeightsInRange`)
-- Weekly record summary: always shows "this week" (Sunday through Saturday including today, independent of the calendar's displayed month) — "training days", "total sets", "total volume" (Σ weight × reps), and "body weight" (latest record that week). The body-weight value links to `/body-weight?date=<today>` (rendered in normal text color, not the accent color)
-  - Per-exercise summary: groups this week's `WorkoutSet` records by `exerciseId` and lists "sets", "total reps", and "max weight" for each exercise, sorted by total volume (weight × reps) descending. Exercises missing from the master list show as "Unregistered exercise". Shows a skeleton while loading and an empty-state message when there are no records for the week
-- A fixed "Record today's workout" button at the bottom → `/record?date=<today>`
+- Weekly record summary: shows the week (Monday through Sunday, `getWeekRange` in `src/utils/date.ts`) containing the selected date — defaults to the current week on load. The heading reads "今週の記録" when the selected week is the current week, otherwise "選択した週の記録" with a "今週" link to jump back. Shows "training days", "total sets", "total volume" (Σ weight × reps), and "body weight" (latest record that week). The body-weight value always links to `/body-weight?date=<today>` regardless of which week is displayed (rendered in normal text color, not the accent color)
+  - Per-exercise summary: groups the selected week's `WorkoutSet` records by `exerciseId`, then by exercise category (chest / back / shoulders / arms / legs / cardio / other, same grouping as the record list screen), each showing "sets", "total reps", and "max weight", sorted by total volume (weight × reps) descending within its category. Exercises missing from the master list are grouped under "Unregistered". Shows a skeleton while loading and an empty-state message when there are no records for the week
+- A fixed "Record a workout" button at the bottom → `/record?date=<today>` (always defaults to today; the record screen's own date picker is used to record a different date)
 
 ### History screen `/history` (`src/pages/History/`)
 
@@ -121,7 +121,8 @@ Owner-based authorization (`allow.owner().identityClaim('sub')`) ensures each us
 
 ### Workout record list screen `/record?date=YYYY-MM-DD`
 
-- The page title shows the target date (e.g. "Workout for Mon, Sep 8"). Since the date comes from calendar navigation, there's no in-page date picker (defaults to today)
+- The page title is the fixed "トレーニング記録" (not date-specific, since the date is now changeable in-page)
+- A date field (native `<input type="date">`, same convention as the Body-weight screen) lets the user change the target date; defaults to today (`useDateParam`)
 - Shows the given day's workout records grouped by category
 - Each exercise summarizes its sets (e.g. "60kg×10 / 60kg×8"); clicking navigates to that exercise's set-input screen
 - The header's "+" button → exercise selection screen `/record/new?date=...`
@@ -174,11 +175,11 @@ Global menu (always shown at the bottom of every authenticated screen, left to r
 / (Home / calendar)
  ├─ Header icon button ────────────> /mypage
  │                                        └─ Sign out / back ──> /login / /
- ├─ Tap a calendar date ────────────> /record?date=<date>
- ├─ "Record today's workout" ───────> /record?date=<today>
+ ├─ Tap a calendar date ────────────> updates the weekly summary in place (no navigation)
+ ├─ "Record a workout" ─────────────> /record?date=<today>
  ├─ Weekly summary body-weight link ─> /body-weight?date=<today>
  │                                        └─ back ──> /
- └─ /record
+ └─ /record (date changeable in-page via a date picker)
       ├─ "+" ──────────────> /record/new
       │                        ├─ click an exercise ──> /record/new/:exerciseId
       │                        │                          └─ back ──> /record/new

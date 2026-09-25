@@ -9,7 +9,7 @@ import {
   LuTrendingUp,
   LuUser,
 } from "react-icons/lu";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Calendar } from "@/components/Calendar/Calendar";
 import { CategoryDot } from "@/components/CategoryDot/CategoryDot";
 import { PageContainer } from "@/components/PageContainer/PageContainer";
@@ -23,14 +23,21 @@ import {
   getWeekRange,
   toDateString,
 } from "@/utils/date";
-import { getExerciseCategory } from "@/utils/exerciseCategories";
+import { EXERCISE_CATEGORIES } from "@/utils/exerciseCategories";
 import styles from "./Home.module.css";
 
 const UNASSIGNED_COLOR = "oklch(0.55 0 0)";
+const UNASSIGNED_CATEGORY = {
+  value: "unassigned",
+  label: "未設定",
+  color: UNASSIGNED_COLOR,
+};
 
 export function HomePage() {
-  const navigate = useNavigate();
   const today = getTodayDateString();
+
+  // カレンダーでタップした日付。この日を含む週の記録をサマリーに表示する
+  const [selectedDate, setSelectedDate] = useState(today);
 
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const now = new Date();
@@ -59,15 +66,19 @@ export function HomePage() {
     [bodyWeights],
   );
 
-  // 週サマリーは常に「今週」(本日を含む日〜土)を対象に別途取得する
-  const currentWeek = useMemo(() => getWeekRange(today), [today]);
+  // 週サマリーは、カレンダーで選択された日付を含む週(月〜日)を対象に取得する
+  const selectedWeek = useMemo(
+    () => getWeekRange(selectedDate),
+    [selectedDate],
+  );
+  const isCurrentWeek = selectedWeek.start === getWeekRange(today).start;
   const { data: weekSets, isPending: isWeekPending } = useWorkoutSetsInRange(
-    currentWeek.start,
-    currentWeek.end,
+    selectedWeek.start,
+    selectedWeek.end,
   );
   const { data: weekWeights } = useBodyWeightsInRange(
-    currentWeek.start,
-    currentWeek.end,
+    selectedWeek.start,
+    selectedWeek.end,
   );
   const { data: exercises } = useExercises();
 
@@ -86,8 +97,8 @@ export function HomePage() {
     };
   }, [weekSets, weekWeights]);
 
-  // 今週の記録を種目ごとにグルーピングし、直近の総挙上量が多い順に並べる
-  const weekExerciseSummaries = useMemo(() => {
+  // その週の記録を種目ごとに集計してから、カテゴリ(腕・胸…)ごとにグルーピングする
+  const weekCategoryGroups = useMemo(() => {
     const exerciseById = new Map(
       (exercises ?? []).map((exercise) => [exercise.id, exercise]),
     );
@@ -98,25 +109,45 @@ export function HomePage() {
       else setsByExerciseId.set(set.exerciseId, [set]);
     }
 
-    return Array.from(setsByExerciseId.entries())
-      .map(([exerciseId, sets]) => {
-        const exercise = exerciseById.get(exerciseId);
-        return {
-          exerciseId,
-          exerciseName: exercise?.name ?? "未設定の種目",
-          categoryColor: exercise
-            ? getExerciseCategory(exercise.category).color
-            : UNASSIGNED_COLOR,
-          setCount: sets.length,
-          totalReps: sets.reduce((sum, set) => sum + set.reps, 0),
-          maxWeight: Math.max(...sets.map((set) => set.weight)),
-          totalVolume: sets.reduce(
-            (sum, set) => sum + set.weight * set.reps,
-            0,
-          ),
-        };
-      })
+    const summarize = (
+      exerciseId: string,
+      sets: NonNullable<typeof weekSets>,
+    ) => {
+      const exercise = exerciseById.get(exerciseId);
+      return {
+        exerciseId,
+        exerciseName: exercise?.name ?? "未設定の種目",
+        setCount: sets.length,
+        totalReps: sets.reduce((sum, set) => sum + set.reps, 0),
+        maxWeight: Math.max(...sets.map((set) => set.weight)),
+        totalVolume: sets.reduce((sum, set) => sum + set.weight * set.reps, 0),
+      };
+    };
+
+    const entries = Array.from(setsByExerciseId.entries());
+
+    const grouped = EXERCISE_CATEGORIES.map((category) => {
+      const items = entries
+        .filter(
+          ([exerciseId]) =>
+            exerciseById.get(exerciseId)?.category === category.value,
+        )
+        .map(([exerciseId, sets]) => summarize(exerciseId, sets))
+        .sort((a, b) => b.totalVolume - a.totalVolume);
+      return { category, items };
+    }).filter((group) => group.items.length > 0);
+
+    const orphanedItems = entries
+      .filter(([exerciseId]) => !exerciseById.has(exerciseId))
+      .map(([exerciseId, sets]) => summarize(exerciseId, sets))
       .sort((a, b) => b.totalVolume - a.totalVolume);
+
+    const unassignedGroup = {
+      category: UNASSIGNED_CATEGORY,
+      items: orphanedItems,
+    };
+
+    return orphanedItems.length > 0 ? [...grouped, unassignedGroup] : grouped;
   }, [weekSets, exercises]);
 
   return (
@@ -134,8 +165,8 @@ export function HomePage() {
         <Calendar
           year={visibleMonth.year}
           month={visibleMonth.month}
-          selectedDate={today}
-          onSelectDate={(date) => navigate(`/record?date=${date}`)}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
           onMonthChange={(year, month) => setVisibleMonth({ year, month })}
           workoutDates={workoutDates}
           weightDates={weightDates}
@@ -143,10 +174,19 @@ export function HomePage() {
 
         <section className={styles.summary}>
           <h2 className={styles.summaryTitle}>
-            今週の記録
+            {isCurrentWeek ? "今週の記録" : "選択した週の記録"}
             <span className={styles.summaryRange}>
-              {formatShortDate(currentWeek.start)} –{" "}
-              {formatShortDate(currentWeek.end)}
+              {formatShortDate(selectedWeek.start)} –{" "}
+              {formatShortDate(selectedWeek.end)}
+              {!isCurrentWeek && (
+                <button
+                  type="button"
+                  className={styles.thisWeekButton}
+                  onClick={() => setSelectedDate(today)}
+                >
+                  今週
+                </button>
+              )}
             </span>
           </h2>
           {isWeekPending ? (
@@ -218,46 +258,67 @@ export function HomePage() {
                 <Skeleton height="4.25rem" borderRadius="var(--radius-card)" />
                 <Skeleton height="4.25rem" borderRadius="var(--radius-card)" />
               </div>
-            ) : weekExerciseSummaries.length === 0 ? (
+            ) : weekCategoryGroups.length === 0 ? (
               <p className={styles.emptyText}>
                 この週のトレーニング記録はまだありません。
               </p>
             ) : (
-              <ul className={styles.exerciseList}>
-                {weekExerciseSummaries.map((item) => (
-                  <li key={item.exerciseId} className={styles.exerciseItem}>
-                    <div className={styles.exerciseItemHead}>
-                      <CategoryDot color={item.categoryColor} />
-                      <span className={styles.exerciseName}>
-                        {item.exerciseName}
-                      </span>
-                    </div>
-                    <dl className={styles.exerciseStats}>
-                      <div className={styles.exerciseStat}>
-                        <dt className={styles.exerciseStatLabel}>セット数</dt>
-                        <dd className={styles.exerciseStatValue}>
-                          {item.setCount}
-                          <span className={styles.summaryUnit}>セット</span>
-                        </dd>
-                      </div>
-                      <div className={styles.exerciseStat}>
-                        <dt className={styles.exerciseStatLabel}>Rep数</dt>
-                        <dd className={styles.exerciseStatValue}>
-                          {item.totalReps}
-                          <span className={styles.summaryUnit}>回</span>
-                        </dd>
-                      </div>
-                      <div className={styles.exerciseStat}>
-                        <dt className={styles.exerciseStatLabel}>最大重量</dt>
-                        <dd className={styles.exerciseStatValue}>
-                          {item.maxWeight}
-                          <span className={styles.summaryUnit}>kg</span>
-                        </dd>
-                      </div>
-                    </dl>
-                  </li>
+              <div className={styles.categoryList}>
+                {weekCategoryGroups.map((group) => (
+                  <div
+                    key={group.category.value}
+                    className={styles.categorySection}
+                  >
+                    <h4 className={styles.categoryTitle}>
+                      <CategoryDot color={group.category.color} />
+                      {group.category.label}
+                    </h4>
+                    <ul className={styles.exerciseList}>
+                      {group.items.map((item) => (
+                        <li
+                          key={item.exerciseId}
+                          className={styles.exerciseItem}
+                        >
+                          <span className={styles.exerciseName}>
+                            {item.exerciseName}
+                          </span>
+                          <dl className={styles.exerciseStats}>
+                            <div className={styles.exerciseStat}>
+                              <dt className={styles.exerciseStatLabel}>
+                                セット数
+                              </dt>
+                              <dd className={styles.exerciseStatValue}>
+                                {item.setCount}
+                                <span className={styles.summaryUnit}>
+                                  セット
+                                </span>
+                              </dd>
+                            </div>
+                            <div className={styles.exerciseStat}>
+                              <dt className={styles.exerciseStatLabel}>
+                                Rep数
+                              </dt>
+                              <dd className={styles.exerciseStatValue}>
+                                {item.totalReps}
+                                <span className={styles.summaryUnit}>回</span>
+                              </dd>
+                            </div>
+                            <div className={styles.exerciseStat}>
+                              <dt className={styles.exerciseStatLabel}>
+                                最大重量
+                              </dt>
+                              <dd className={styles.exerciseStatValue}>
+                                {item.maxWeight}
+                                <span className={styles.summaryUnit}>kg</span>
+                              </dd>
+                            </div>
+                          </dl>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         </section>
@@ -267,7 +328,7 @@ export function HomePage() {
         <Button size="lg" w="full" boxShadow="lg" asChild>
           <Link to={`/record?date=${today}`}>
             <LuNotebookPen />
-            本日のトレーニングを記録
+            トレーニングを記録
           </Link>
         </Button>
       </div>

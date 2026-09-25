@@ -21,11 +21,26 @@
   font-weight: 600;
 }
 
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-block: 1rem;
+}
+
+.dateLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
 .list {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .loadingRow {
