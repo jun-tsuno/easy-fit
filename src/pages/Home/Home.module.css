@@ -129,6 +129,28 @@
   color: var(--color-fg-muted);
 }
 
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.categorySection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.categoryTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-fg-muted);
+}
+
 .exerciseList {
   display: flex;
   flex-direction: column;
@@ -145,12 +167,6 @@
   padding: 0.875rem 1rem;
   border-radius: var(--radius-card);
   background-color: var(--color-bg-muted);
-}
-
-.exerciseItemHead {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .exerciseName {
